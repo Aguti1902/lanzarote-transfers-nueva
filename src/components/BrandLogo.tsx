@@ -27,7 +27,7 @@ export function BrandLogo({
         fill
         priority={priority}
         sizes={sizes}
-        className={`object-contain object-left ${onLight ? "" : "mix-blend-screen"}`}
+        className={`object-contain object-left ${onLight ? "" : "[mix-blend-mode:lighten]"}`}
       />
     </span>
   );
