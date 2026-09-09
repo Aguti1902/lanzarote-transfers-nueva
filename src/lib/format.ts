@@ -1,0 +1,178 @@
+import type { Locale } from "@/i18n/config";
+
+export function intlLocale(locale: Locale | string = "es"): string {
+  if (locale === "en") return "en-GB";
+  if (locale === "de") return "de-DE";
+  return "es-ES";
+}
+
+export function formatPrice(
+  amount: number,
+  currency = "EUR",
+  locale: Locale | string = "es"
+): string {
+  return new Intl.NumberFormat(intlLocale(locale), {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function formatDate(iso: string, locale: Locale | string = "es"): string {
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(iso);
+  const value = dateOnly ? new Date(`${iso}T12:00:00`) : new Date(iso);
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(value);
+}
+
+export function formatDateShort(iso: string): string {
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(iso);
+  const value = dateOnly ? new Date(`${iso}T12:00:00`) : new Date(iso);
+  const dd = String(value.getDate()).padStart(2, "0");
+  const mm = String(value.getMonth() + 1).padStart(2, "0");
+  const yyyy = value.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+export function formatWeekday(
+  iso: string,
+  locale: Locale | string = "es"
+): string {
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(iso);
+  const value = dateOnly ? new Date(`${iso}T12:00:00`) : new Date(iso);
+  return new Intl.DateTimeFormat(intlLocale(locale), { weekday: "long" }).format(
+    value
+  );
+}
+
+export function groupSizeLabel(
+  size?: "small" | "large",
+  locale: Locale | string = "es"
+): string {
+  const map = {
+    es: { small: "Grupo reducido", large: "Grupo grande", private: "Privado" },
+    en: { small: "Small group", large: "Large group", private: "Private" },
+    de: { small: "Kleine Gruppe", large: "Große Gruppe", private: "Privat" },
+  } as const;
+  const L = map[(locale as Locale) in map ? (locale as Locale) : "es"];
+  if (size === "small") return L.small;
+  if (size === "large") return L.large;
+  return L.private;
+}
+
+export function paymentLabel(
+  method: string,
+  locale: Locale | string = "es"
+): string {
+  const map: Record<string, Record<string, string>> = {
+    es: {
+      card: "Pago 100% online",
+      bizum: "Pago 100% online",
+      pay_on_day: "Pago el día del tour",
+      deposit_10: "10% tarjeta + resto efectivo",
+      deposit_20: "20% tarjeta + resto efectivo",
+    },
+    en: {
+      card: "100% online payment",
+      bizum: "100% online payment",
+      pay_on_day: "Pay on the day",
+      deposit_10: "10% card + cash balance",
+      deposit_20: "20% card + cash balance",
+    },
+    de: {
+      card: "100% Online-Zahlung",
+      bizum: "100% Online-Zahlung",
+      pay_on_day: "Zahlung am Tourtag",
+      deposit_10: "10% Karte + Rest bar",
+      deposit_20: "20% Karte + Rest bar",
+    },
+  };
+  const L = map[locale as string] || map.es;
+  return L[method] ?? method;
+}
+
+const LANG_LABELS: Record<string, Record<string, string>> = {
+  es: {
+    es: "Español",
+    en: "Inglés",
+    de: "Alemán",
+    it: "Italiano",
+    fr: "Francés",
+    pt: "Portugués",
+    español: "Español",
+    espanol: "Español",
+    english: "Inglés",
+    deutsch: "Alemán",
+    german: "Alemán",
+  },
+  en: {
+    es: "Spanish",
+    en: "English",
+    de: "German",
+    it: "Italian",
+    fr: "French",
+    pt: "Portuguese",
+    español: "Spanish",
+    espanol: "Spanish",
+    english: "English",
+    deutsch: "German",
+    german: "German",
+  },
+  de: {
+    es: "Spanisch",
+    en: "Englisch",
+    de: "Deutsch",
+    it: "Italienisch",
+    fr: "Französisch",
+    pt: "Portugiesisch",
+    español: "Spanisch",
+    espanol: "Spanisch",
+    english: "Englisch",
+    deutsch: "Deutsch",
+    german: "Deutsch",
+  },
+};
+
+/** Normaliza códigos/nombres de idioma para la UI pública. */
+export function formatTourLanguages(
+  languages: string[] | undefined,
+  locale: Locale | string = "es"
+): string {
+  if (!languages?.length) return "";
+  const table = LANG_LABELS[locale as string] || LANG_LABELS.es;
+  const seen = new Set<string>();
+  const labels: string[] = [];
+  for (const raw of languages) {
+    const key = raw.trim().toLowerCase();
+    if (!key) continue;
+    const label = table[key] || raw.trim();
+    const dedupe = label.toLowerCase();
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    labels.push(label);
+  }
+  return labels.join(", ");
+}
+
+/** Quita bloques legacy de salidas/precios pegados al final de la descripción. */
+export function cleanTourDescription(text: string): string {
+  if (!text) return "";
+  // Conservar HTML del editor enriquecido.
+  if (/<\/?[a-z][\s\S]*>/i.test(text)) {
+    return text.trim();
+  }
+  let out = text
+    .replace(/\r\n/g, "\n")
+    .replace(/\u00ad/g, "")
+    .replace(/í­/g, "í");
+
+  out = out.replace(
+    /\n?\s*(Salidas|Incluido|Precios|Departures|Included|Prices|Abfahrt|Inbegriffen|Preise)\s*:\s*[\s\S]*$/i,
+    ""
+  );
+
+  return out.replace(/\n{3,}/g, "\n\n").trim();
+}

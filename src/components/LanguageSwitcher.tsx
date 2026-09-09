@@ -1,0 +1,47 @@
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+import { locales, localeLabels, type Locale } from "@/i18n/config";
+import { switchLocalePath } from "@/i18n/path";
+import { useLocale } from "@/components/LocaleProvider";
+import { useAppLoadingOptional } from "@/components/AppLoadingProvider";
+
+export function LanguageSwitcher() {
+  const { locale, dict } = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  const loading = useAppLoadingOptional();
+
+  function switchTo(next: Locale) {
+    if (next === locale) return;
+    const search =
+      typeof window !== "undefined" ? window.location.search : "";
+    const target = switchLocalePath(pathname, next, search);
+    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000`;
+    loading?.startLanguageSwitch(next, locale);
+    router.prefetch(target);
+    router.push(target);
+    router.refresh();
+  }
+
+  return (
+    <label className="relative inline-flex items-center">
+      <span className="sr-only">{dict.common.language}</span>
+      <select
+        value={locale}
+        onChange={(e) => switchTo(e.target.value as Locale)}
+        className="cursor-pointer appearance-none rounded-full border border-white/20 bg-white/10 py-1.5 pr-7 pl-3 text-xs font-bold text-white outline-none hover:bg-white/15"
+        aria-label={dict.common.language}
+      >
+        {locales.map((code) => (
+          <option key={code} value={code} className="text-ink">
+            {localeLabels[code]}
+          </option>
+        ))}
+      </select>
+      <span className="pointer-events-none absolute right-2 text-[10px] text-white/70">
+        ▾
+      </span>
+    </label>
+  );
+}

@@ -1,0 +1,115 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Menu, User, X } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
+import { useLocale } from "@/components/LocaleProvider";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { internalPathFromPathname } from "@/i18n/path";
+
+export function Header() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { dict, href } = useLocale();
+  const internalPath = internalPathFromPathname(pathname);
+
+  const links = [
+    { href: href("/traslados"), path: "/traslados-aeropuerto-lanzarote", label: dict.nav.transfers },
+    { href: href("/sobre-nosotros"), path: "/sobre-nosotros", label: dict.nav.about },
+    { href: href("/contacto"), path: "/contacto", label: dict.nav.contact },
+  ];
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (pathname.startsWith("/admin")) return null;
+
+  return (
+    <header
+      className={`sticky top-0 z-50 text-white transition-all duration-300 ${
+        scrolled
+          ? "bg-ocean/95 shadow-[0_10px_40px_rgba(12,27,51,0.32)] backdrop-blur-xl"
+          : "bg-ocean"
+      }`}
+    >
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+        <Link
+          href={href("/")}
+          className="shrink-0 transition hover:opacity-90"
+        >
+          <BrandLogo variant="onDark" priority />
+        </Link>
+
+        <nav className="hidden items-center gap-0.5 lg:flex">
+          {links.map((link) => {
+            const active =
+              internalPath === link.path ||
+              internalPath.startsWith(`${link.path}/`);
+            return (
+              <Link
+                key={link.path}
+                href={link.href}
+                className={`rounded-full px-3.5 py-2 text-[13px] font-semibold tracking-wide uppercase transition ${
+                  active
+                    ? "bg-white text-ocean"
+                    : "text-white/90 hover:bg-white/15 hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-1.5">
+          <div className="hidden sm:block">
+            <LanguageSwitcher />
+          </div>
+          <Link
+            href={href("/gestionar-reserva")}
+            className="rounded-full p-2.5 text-white/95 transition hover:bg-white/15"
+            title={dict.nav.manageBooking}
+            aria-label={dict.nav.manageBooking}
+          >
+            <User className="h-5 w-5" />
+          </Link>
+          <button
+            type="button"
+            className="rounded-full p-2.5 text-white lg:hidden"
+            aria-label={open ? dict.common.close : dict.common.menu}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="border-t border-white/20 bg-ocean-deep px-4 py-4 lg:hidden">
+          <div className="mb-3">
+            <LanguageSwitcher />
+          </div>
+          <nav className="flex flex-col gap-1">
+            {links.map((link) => (
+              <Link
+                key={link.path}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-3 py-3 text-base font-semibold uppercase tracking-wide text-white hover:bg-white/10"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}

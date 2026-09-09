@@ -1,0 +1,819 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import type { Locale } from "@/i18n/config";
+import type { PageContentBlock, PageFaqItem, SiteSettings } from "@/types";
+import { ContentBlocksEditor } from "@/components/admin/ContentBlocksEditor";
+import { FaqEditor } from "@/components/admin/FaqEditor";
+import { Field, adminInput, adminTextarea } from "@/components/admin/Field";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import {
+  pickSettingsTranslations,
+  SETTINGS_STRING_KEYS,
+  SETTINGS_TRANSLATABLE_KEYS,
+  type SettingsStringKey,
+  type SettingsTranslatableKey,
+} from "@/lib/settings-i18n";
+
+const empty: SiteSettings = {
+  brandName: "",
+  tagline: "",
+  phone: "",
+  email: "",
+  hours: "",
+  homeHeadline: "",
+  homeSubheadline: "",
+  homeHeroImage: "",
+  homeHeroPosition: "50% 50%",
+  aboutTitle: "",
+  aboutLead: "",
+  aboutText: "",
+  aboutImage: "",
+  aboutImageSecondary: "",
+  aboutHeroPosition: "50% 40%",
+  aboutValues: "",
+  aboutPromise: "",
+  aboutFaqTitle: "",
+  aboutFaqs: [],
+  aboutBlocksTitle: "",
+  aboutBlocksIntro: "",
+  aboutBlocks: [],
+  excursionsTitle: "",
+  excursionsIntro: "",
+  excursionsText: "",
+  excursionsHeroImage: "",
+  excursionsHeroPosition: "50% 40%",
+  excursionsFaqTitle: "",
+  excursionsFaqs: [],
+  excursionsBlocksTitle: "",
+  excursionsBlocksIntro: "",
+  excursionsBlocks: [],
+  blogTitle: "",
+  blogIntro: "",
+  blogText: "",
+  blogHeroImage: "",
+  blogHeroPosition: "50% 40%",
+  blogFaqTitle: "",
+  blogFaqs: [],
+  blogBlocksTitle: "",
+  blogBlocksIntro: "",
+  blogBlocks: [],
+  cruiseHeadline: "",
+  cruiseIntro: "",
+  cruiseText: "",
+  cruiseHeroImage: "",
+  cruiseHeroPosition: "50% 45%",
+  cruiseFaqTitle: "",
+  cruiseFaqs: [],
+  cruiseBlocksTitle: "",
+  cruiseBlocksIntro: "",
+  cruiseBlocks: [],
+  transferTitle: "",
+  transferIntro: "",
+  transferText: "",
+  transferHeroImage: "",
+  transferHeroPosition: "50% 45%",
+  transferFaqTitle: "",
+  transferFaqs: [],
+  transferBlocksTitle: "",
+  transferBlocksIntro: "",
+  transferBlocks: [],
+  housesHeroImage: "",
+  housesHeroPosition: "50% 40%",
+  housesFaqTitle: "",
+  housesFaqs: [],
+  housesBlocksTitle: "",
+  housesBlocksIntro: "",
+  housesBlocks: [],
+  contactHeroImage: "",
+  contactHeroPosition: "50% 40%",
+  contactFaqTitle: "",
+  contactFaqs: [],
+  contactBlocksTitle: "",
+  contactBlocksIntro: "",
+  contactBlocks: [],
+  companyLegalName: "",
+  companyTaxId: "",
+  companyAddress: "",
+  taxRate: 7,
+  bannerEs: "",
+  bannerEn: "",
+  bannerDe: "",
+};
+
+const HERO_HINT =
+  "Puedes recortar la foto y, además, mover el encuadre (horizontal/vertical) para que se vea bien en la web. Guarda al terminar.";
+
+const localeTabs: { id: Locale; label: string }[] = [
+  { id: "es", label: "Español" },
+  { id: "en", label: "Inglés" },
+  { id: "de", label: "Alemán" },
+];
+
+type SectionId = "brand" | "home" | "about" | "transfers";
+
+const SECTION_KEYS: Record<SectionId, SettingsTranslatableKey[]> = {
+  brand: ["tagline", "hours"],
+  home: ["homeHeadline", "homeSubheadline"],
+  about: [
+    "aboutTitle",
+    "aboutLead",
+    "aboutText",
+    "aboutValues",
+    "aboutPromise",
+    "aboutFaqTitle",
+    "aboutBlocksTitle",
+    "aboutBlocksIntro",
+  ],
+  transfers: [
+    "transferTitle",
+    "transferIntro",
+    "transferText",
+    "transferFaqTitle",
+    "transferBlocksTitle",
+    "transferBlocksIntro",
+  ],
+};
+
+function emptyOverlay(): Partial<SiteSettings> {
+  return pickSettingsTranslations(
+    Object.fromEntries(
+      SETTINGS_STRING_KEYS.map((k) => [k, ""])
+    ) as Partial<SiteSettings>
+  );
+}
+
+export default function AdminAjustesPage() {
+  const [settings, setSettings] = useState<SiteSettings>(empty);
+  const [en, setEn] = useState<Partial<SiteSettings>>(emptyOverlay());
+  const [de, setDe] = useState<Partial<SiteSettings>>(emptyOverlay());
+  const [locale, setLocale] = useState<Locale>("es");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      try {
+        const [esRes, enRes, deRes] = await Promise.all([
+          fetch("/api/settings"),
+          fetch("/api/admin/content-translations?locale=en"),
+          fetch("/api/admin/content-translations?locale=de"),
+        ]);
+        const esData = await esRes.json();
+        const enData = await enRes.json();
+        const deData = await deRes.json();
+        if (cancelled) return;
+        setSettings({ ...empty, ...esData.settings });
+        setEn({ ...emptyOverlay(), ...pickSettingsTranslations(enData.settings) });
+        setDe({ ...emptyOverlay(), ...pickSettingsTranslations(deData.settings) });
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const overlay = locale === "en" ? en : locale === "de" ? de : null;
+  const setOverlay = locale === "en" ? setEn : locale === "de" ? setDe : null;
+
+  function textValue(key: SettingsStringKey): string {
+    if (locale === "es") {
+      const v = settings[key];
+      return typeof v === "string" ? v : "";
+    }
+    const v = overlay?.[key];
+    return typeof v === "string" ? v : "";
+  }
+
+  function setText(key: SettingsStringKey, value: string) {
+    if (locale === "es") {
+      setSettings((prev) => ({ ...prev, [key]: value }));
+      return;
+    }
+    setOverlay?.((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setShared<K extends keyof SiteSettings>(key: K, value: SiteSettings[K]) {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function faqsValue(
+    key: keyof Pick<
+      SiteSettings,
+      | "aboutFaqs"
+      | "excursionsFaqs"
+      | "blogFaqs"
+      | "cruiseFaqs"
+      | "transferFaqs"
+      | "housesFaqs"
+      | "contactFaqs"
+    >
+  ): PageFaqItem[] {
+    if (locale === "es") return settings[key] || [];
+    const overlayList = overlay?.[key];
+    return Array.isArray(overlayList) ? overlayList : [];
+  }
+
+  function setFaqs(
+    key: keyof Pick<
+      SiteSettings,
+      | "aboutFaqs"
+      | "excursionsFaqs"
+      | "blogFaqs"
+      | "cruiseFaqs"
+      | "transferFaqs"
+      | "housesFaqs"
+      | "contactFaqs"
+    >,
+    value: PageFaqItem[]
+  ) {
+    if (locale === "es") {
+      setSettings((prev) => ({ ...prev, [key]: value }));
+      return;
+    }
+    setOverlay?.((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function blocksValue(
+    key: keyof Pick<
+      SiteSettings,
+      | "aboutBlocks"
+      | "excursionsBlocks"
+      | "blogBlocks"
+      | "cruiseBlocks"
+      | "transferBlocks"
+      | "housesBlocks"
+      | "contactBlocks"
+    >
+  ): PageContentBlock[] {
+    if (locale === "es") return settings[key] || [];
+    const overlayList = overlay?.[key];
+    return Array.isArray(overlayList) ? overlayList : [];
+  }
+
+  function setBlocks(
+    key: keyof Pick<
+      SiteSettings,
+      | "aboutBlocks"
+      | "excursionsBlocks"
+      | "blogBlocks"
+      | "cruiseBlocks"
+      | "transferBlocks"
+      | "housesBlocks"
+      | "contactBlocks"
+    >,
+    value: PageContentBlock[]
+  ) {
+    if (locale === "es") {
+      setSettings((prev) => ({ ...prev, [key]: value }));
+      return;
+    }
+    setOverlay?.((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+    try {
+      const esRes = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+      if (!esRes.ok) throw new Error("es");
+
+      const [enRes, deRes] = await Promise.all([
+        fetch("/api/admin/content-translations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ locale: "en", settings: en }),
+        }),
+        fetch("/api/admin/content-translations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ locale: "de", settings: de }),
+        }),
+      ]);
+      if (!enRes.ok || !deRes.ok) throw new Error("i18n");
+
+      setMessage(
+        "Ajustes y traducciones guardados. Se reflejan en la web pública (puede tardar unos segundos por la caché)."
+      );
+    } catch {
+      setMessage("Error al guardar");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function generateTranslations(section?: SectionId) {
+    setGenerating(true);
+    setMessage("");
+    try {
+      const keys = section
+        ? SECTION_KEYS[section]
+        : [...SETTINGS_TRANSLATABLE_KEYS];
+      const source = pickSettingsTranslations(settings);
+      const res = await fetch("/api/admin/translate-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source, keys }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "fail");
+
+      const nextEn = {
+        ...en,
+        ...pickSettingsTranslations(data.translations?.en),
+      };
+      const nextDe = {
+        ...de,
+        ...pickSettingsTranslations(data.translations?.de),
+      };
+      setEn(nextEn);
+      setDe(nextDe);
+
+      if (locale === "es") setLocale("en");
+      setMessage(
+        data.mode === "openai"
+          ? "Traducciones generadas (EN y DE). Revíselas y pulse Guardar."
+          : "Borrador generado sin OpenAI (copia del español). Edite EN/DE y guarde. Configure OPENAI_API_KEY para traducción automática."
+      );
+    } catch {
+      setMessage("No se pudieron generar las traducciones");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  const localeHint = useMemo(() => {
+    if (locale === "es") {
+      return "Editando textos en español (base). Las imágenes son comunes a todos los idiomas.";
+    }
+    return `Editando textos en ${locale === "en" ? "inglés" : "alemán"}. Aquí se traducen: textos, apartados («Lanzarote, una isla…»), FAQs y títulos. Si un campo está vacío, no se muestra el español en la web. Use «Generar esta sección» o «Generar traducciones EN + DE», revise y pulse Guardar.`;
+  }, [locale]);
+
+  if (loading) return <p className="text-ink-muted">Cargando…</p>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl text-ink">Ajustes de la web</h1>
+          <p className="mt-1 max-w-2xl text-sm text-ink-muted">
+            Textos e imágenes por página. En cada idioma puede editar los textos;
+            puede generar EN/DE automáticamente y luego retocarlos.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {localeTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setLocale(tab.id)}
+              className={`rounded px-4 py-2 text-sm font-bold ${
+                locale === tab.id
+                  ? "bg-ocean text-white"
+                  : "bg-white text-ink ring-1 ring-sand-line"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 rounded-xl bg-white p-4 ring-1 ring-sand-line">
+        <p className="text-sm text-ink-muted">{localeHint}</p>
+        <button
+          type="button"
+          disabled={generating}
+          onClick={() => generateTranslations()}
+          className="ml-auto rounded bg-header px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+        >
+          {generating ? "Generando…" : "Generar traducciones EN + DE"}
+        </button>
+      </div>
+
+      {message && (
+        <p className="rounded-lg bg-sky-soft px-4 py-2 text-sm text-ocean-deep ring-1 ring-sand-line">
+          {message}
+        </p>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <section className="grid gap-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line md:grid-cols-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 md:col-span-2">
+            <h2 className="font-display text-xl">Contacto y marca</h2>
+            {locale === "es" ? null : (
+              <button
+                type="button"
+                disabled={generating}
+                onClick={() => generateTranslations("brand")}
+                className="text-xs font-bold text-ocean hover:underline disabled:opacity-50"
+              >
+                Generar esta sección
+              </button>
+            )}
+          </div>
+          {locale === "es" ? (
+            <>
+              <Field label="Nombre de marca">
+                <input
+                  className={adminInput}
+                  value={settings.brandName}
+                  onChange={(e) => setShared("brandName", e.target.value)}
+                />
+              </Field>
+              <Field label="Teléfono">
+                <input
+                  className={adminInput}
+                  value={settings.phone}
+                  onChange={(e) => setShared("phone", e.target.value)}
+                />
+              </Field>
+              <Field label="Email">
+                <input
+                  type="email"
+                  className={adminInput}
+                  value={settings.email}
+                  onChange={(e) => setShared("email", e.target.value)}
+                />
+              </Field>
+            </>
+          ) : (
+            <p className="text-sm text-ink-muted md:col-span-2">
+              Nombre, teléfono y email son comunes (no se traducen).
+            </p>
+          )}
+          <Field label="Eslogan corto">
+            <input
+              className={adminInput}
+              value={textValue("tagline")}
+              onChange={(e) => setText("tagline", e.target.value)}
+            />
+          </Field>
+          <Field label="Horario" className="md:col-span-2">
+            <input
+              className={adminInput}
+              value={textValue("hours")}
+              onChange={(e) => setText("hours", e.target.value)}
+            />
+          </Field>
+        </section>
+
+        <section className="space-y-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-xl">Inicio</h2>
+            {locale !== "es" && (
+              <button
+                type="button"
+                disabled={generating}
+                onClick={() => generateTranslations("home")}
+                className="text-xs font-bold text-ocean hover:underline disabled:opacity-50"
+              >
+                Generar esta sección
+              </button>
+            )}
+          </div>
+          <Field label="Titular">
+            <input
+              className={adminInput}
+              value={textValue("homeHeadline")}
+              onChange={(e) => setText("homeHeadline", e.target.value)}
+            />
+          </Field>
+          <Field label="Subtítulo">
+            <RichTextEditor
+              value={textValue("homeSubheadline")}
+              onChange={(html) => setText("homeSubheadline", html)}
+              minHeight={90}
+            />
+          </Field>
+          <ImageUploadField
+            label="Imagen hero inicio"
+            folder="home"
+            value={settings.homeHeroImage}
+            onChange={(url) => setShared("homeHeroImage", url)}
+            objectPosition={settings.homeHeroPosition}
+            onObjectPositionChange={(pos) => setShared("homeHeroPosition", pos)}
+            aspectRatio={16 / 9}
+            hint={HERO_HINT}
+          />
+        </section>
+
+        <section className="space-y-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-xl">Sobre nosotros</h2>
+            {locale !== "es" && (
+              <button
+                type="button"
+                disabled={generating}
+                onClick={() => generateTranslations("about")}
+                className="text-xs font-bold text-ocean hover:underline disabled:opacity-50"
+              >
+                Generar esta sección
+              </button>
+            )}
+          </div>
+          <Field label="Título">
+            <input
+              className={adminInput}
+              value={textValue("aboutTitle")}
+              onChange={(e) => setText("aboutTitle", e.target.value)}
+            />
+          </Field>
+          <Field label="Entradilla">
+            <RichTextEditor
+              value={textValue("aboutLead")}
+              onChange={(html) => setText("aboutLead", html)}
+              minHeight={100}
+            />
+          </Field>
+          <Field label="Texto completo">
+            <RichTextEditor
+              value={textValue("aboutText")}
+              onChange={(html) => setText("aboutText", html)}
+              minHeight={200}
+            />
+          </Field>
+          <Field label="Valores (uno por línea)">
+            <textarea
+              className={adminTextarea}
+              value={textValue("aboutValues")}
+              onChange={(e) => setText("aboutValues", e.target.value)}
+            />
+          </Field>
+          <Field label="Promesa">
+            <RichTextEditor
+              value={textValue("aboutPromise")}
+              onChange={(html) => setText("aboutPromise", html)}
+              minHeight={100}
+            />
+          </Field>
+          <ImageUploadField
+            label="Imagen hero / principal"
+            folder="about"
+            value={settings.aboutImage}
+            onChange={(url) => setShared("aboutImage", url)}
+            objectPosition={settings.aboutHeroPosition}
+            onObjectPositionChange={(pos) => setShared("aboutHeroPosition", pos)}
+            aspectRatio={16 / 9}
+            hint={HERO_HINT}
+          />
+          <ImageUploadField
+            label="Imagen secundaria"
+            folder="about"
+            value={settings.aboutImageSecondary}
+            onChange={(url) => setShared("aboutImageSecondary", url)}
+            aspectRatio={4 / 3}
+          />
+          <ContentBlocksEditor
+            sectionTitle={textValue("aboutBlocksTitle")}
+            sectionIntro={textValue("aboutBlocksIntro")}
+            blocks={blocksValue("aboutBlocks")}
+            folder="about"
+            onTitleChange={(v) => setText("aboutBlocksTitle", v)}
+            onIntroChange={(v) => setText("aboutBlocksIntro", v)}
+            onChange={(blocks) => setBlocks("aboutBlocks", blocks)}
+            onCopyFromBase={
+              locale === "es"
+                ? undefined
+                : () => {
+                    setText("aboutBlocksTitle", settings.aboutBlocksTitle || "");
+                    setText("aboutBlocksIntro", settings.aboutBlocksIntro || "");
+                    setBlocks("aboutBlocks", settings.aboutBlocks || []);
+                  }
+            }
+          />
+          <FaqEditor
+            title={textValue("aboutFaqTitle")}
+            faqs={faqsValue("aboutFaqs")}
+            onTitleChange={(v) => setText("aboutFaqTitle", v)}
+            onChange={(faqs) => setFaqs("aboutFaqs", faqs)}
+            onCopyFromBase={
+              locale === "es"
+                ? undefined
+                : () => {
+                    setText("aboutFaqTitle", settings.aboutFaqTitle || "");
+                    setFaqs("aboutFaqs", settings.aboutFaqs || []);
+                  }
+            }
+          />
+        </section>
+
+        <section className="space-y-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-xl">Traslados</h2>
+            {locale !== "es" && (
+              <button
+                type="button"
+                disabled={generating}
+                onClick={() => generateTranslations("transfers")}
+                className="text-xs font-bold text-ocean hover:underline disabled:opacity-50"
+              >
+                Generar esta sección
+              </button>
+            )}
+          </div>
+          <Field label="Título">
+            <input
+              className={adminInput}
+              value={textValue("transferTitle")}
+              onChange={(e) => setText("transferTitle", e.target.value)}
+            />
+          </Field>
+          <Field label="Entradilla">
+            <RichTextEditor
+              value={textValue("transferIntro")}
+              onChange={(html) => setText("transferIntro", html)}
+              minHeight={100}
+            />
+          </Field>
+          <Field label="Texto completo">
+            <RichTextEditor
+              value={textValue("transferText")}
+              onChange={(html) => setText("transferText", html)}
+              minHeight={200}
+            />
+          </Field>
+          <ImageUploadField
+            label="Imagen hero"
+            folder="transfers"
+            value={settings.transferHeroImage}
+            onChange={(url) => setShared("transferHeroImage", url)}
+            objectPosition={settings.transferHeroPosition}
+            onObjectPositionChange={(pos) =>
+              setShared("transferHeroPosition", pos)
+            }
+            aspectRatio={16 / 9}
+            hint={HERO_HINT}
+          />
+          <ContentBlocksEditor
+            sectionTitle={textValue("transferBlocksTitle")}
+            sectionIntro={textValue("transferBlocksIntro")}
+            blocks={blocksValue("transferBlocks")}
+            folder="transfers"
+            onTitleChange={(v) => setText("transferBlocksTitle", v)}
+            onIntroChange={(v) => setText("transferBlocksIntro", v)}
+            onChange={(blocks) => setBlocks("transferBlocks", blocks)}
+            onCopyFromBase={
+              locale === "es"
+                ? undefined
+                : () => {
+                    setText(
+                      "transferBlocksTitle",
+                      settings.transferBlocksTitle || ""
+                    );
+                    setText(
+                      "transferBlocksIntro",
+                      settings.transferBlocksIntro || ""
+                    );
+                    setBlocks("transferBlocks", settings.transferBlocks || []);
+                  }
+            }
+          />
+          <FaqEditor
+            title={textValue("transferFaqTitle")}
+            faqs={faqsValue("transferFaqs")}
+            onTitleChange={(v) => setText("transferFaqTitle", v)}
+            onChange={(faqs) => setFaqs("transferFaqs", faqs)}
+            onCopyFromBase={
+              locale === "es"
+                ? undefined
+                : () => {
+                    setText("transferFaqTitle", settings.transferFaqTitle || "");
+                    setFaqs("transferFaqs", settings.transferFaqs || []);
+                  }
+            }
+          />
+        </section>
+
+        <section className="space-y-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
+          <h2 className="font-display text-xl">Contacto</h2>
+          <ImageUploadField
+            label="Imagen hero"
+            folder="contact"
+            value={settings.contactHeroImage || ""}
+            onChange={(url) => setShared("contactHeroImage", url)}
+            objectPosition={settings.contactHeroPosition}
+            onObjectPositionChange={(pos) =>
+              setShared("contactHeroPosition", pos)
+            }
+            aspectRatio={16 / 9}
+            hint={HERO_HINT}
+          />
+          <ContentBlocksEditor
+            sectionTitle={textValue("contactBlocksTitle")}
+            sectionIntro={textValue("contactBlocksIntro")}
+            blocks={blocksValue("contactBlocks")}
+            folder="contact"
+            onTitleChange={(v) => setText("contactBlocksTitle", v)}
+            onIntroChange={(v) => setText("contactBlocksIntro", v)}
+            onChange={(blocks) => setBlocks("contactBlocks", blocks)}
+            onCopyFromBase={
+              locale === "es"
+                ? undefined
+                : () => {
+                    setText(
+                      "contactBlocksTitle",
+                      settings.contactBlocksTitle || ""
+                    );
+                    setText(
+                      "contactBlocksIntro",
+                      settings.contactBlocksIntro || ""
+                    );
+                    setBlocks("contactBlocks", settings.contactBlocks || []);
+                  }
+            }
+          />
+          <FaqEditor
+            title={textValue("contactFaqTitle")}
+            faqs={faqsValue("contactFaqs")}
+            onTitleChange={(v) => setText("contactFaqTitle", v)}
+            onChange={(faqs) => setFaqs("contactFaqs", faqs)}
+            onCopyFromBase={
+              locale === "es"
+                ? undefined
+                : () => {
+                    setText("contactFaqTitle", settings.contactFaqTitle || "");
+                    setFaqs("contactFaqs", settings.contactFaqs || []);
+                  }
+            }
+          />
+        </section>
+
+        <section className="grid gap-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
+          <h2 className="font-display text-xl">Banner de la web</h2>
+          <p className="text-sm text-ink-muted">
+            El banner multiidioma se gestiona en su propia sección del menú.
+          </p>
+          <a
+            href="/admin/banner"
+            className="w-fit text-sm font-bold text-ocean hover:underline"
+          >
+            Ir a Banner →
+          </a>
+        </section>
+
+        <section className="grid gap-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line md:grid-cols-2">
+          <h2 className="font-display text-xl md:col-span-2">
+            Datos fiscales (facturas)
+          </h2>
+          <Field label="Razón social">
+            <input
+              className={adminInput}
+              value={settings.companyLegalName || ""}
+              onChange={(e) => setShared("companyLegalName", e.target.value)}
+            />
+          </Field>
+          <Field label="NIF / CIF">
+            <input
+              className={adminInput}
+              value={settings.companyTaxId || ""}
+              onChange={(e) => setShared("companyTaxId", e.target.value)}
+            />
+          </Field>
+          <Field label="Dirección fiscal" className="md:col-span-2">
+            <input
+              className={adminInput}
+              value={settings.companyAddress || ""}
+              onChange={(e) => setShared("companyAddress", e.target.value)}
+            />
+          </Field>
+          <Field label="% IGIC">
+            <input
+              type="number"
+              min={0}
+              max={30}
+              step={0.1}
+              className={adminInput}
+              value={settings.taxRate ?? 7}
+              onChange={(e) => setShared("taxRate", Number(e.target.value))}
+            />
+          </Field>
+          <p className="text-xs text-ink-muted md:col-span-2">
+            En Canarias se aplica IGIC (no IVA). Valor habitual del servicio: 7%.
+          </p>
+        </section>
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-md bg-ocean px-6 py-2.5 text-sm font-semibold text-white hover:bg-ocean-deep disabled:opacity-60"
+        >
+          {saving ? "Guardando…" : "Guardar ajustes y traducciones"}
+        </button>
+      </form>
+    </div>
+  );
+}

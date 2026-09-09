@@ -1,0 +1,241 @@
+{
+  "brandName": "Lanzarote Transfers",
+  "tagline": "Traslados privados aeropuerto ↔ hotel",
+  "phone": "+34 646 08 05 85",
+  "email": "support@lanzaroteexperiencetours.com",
+  "hours": "Contacto 24 / 7",
+  "homeHeadline": "Lanzarote Transfers",
+  "homeSubheadline": "Traslados privados aeropuerto ↔ hotel",
+  "homeHeroImage": "/images/heroes/transfer.jpg",
+  "aboutTitle": "Lanzarote Transfers",
+  "aboutLead": "Somos una empresa familiar local de Lanzarote especializada en traslados privados. Nuestro objetivo es simple: que su llegada y su salida de la isla sean cómodas, puntuales y sin esperas.",
+  "aboutText": "Le esperamos en la terminal de llegadas del Aeropuerto de Lanzarote (ACE) con un cartel con su nombre y le llevamos puerta a puerta hasta su hotel, villa o alojamiento.\n\nTrabajamos con vehículos climatizados y chóferes locales que conocen cada zona de la isla: Playa Blanca, Puerto del Carmen, Costa Teguise, Puerto Calero, Arrecife y más.\n\nSi su vuelo se retrasa, adaptamos la recogida. Reserve ida, vuelta o ida y vuelta online, con tarifa por vehículo y confirmación inmediata.",
+  "aboutImage": "https://wdnviethdarcmneghhqv.supabase.co/storage/v1/object/public/uploads/about/mtk7uz32-l7lwrn.jpg",
+  "aboutImageSecondary": "/images/home/aeropuerto.jpg",
+  "aboutValues": "Puntualidad\nComodidad\nTransparencia\nAtención 24/7\nChófer local\nPrecio cerrado",
+  "aboutPromise": "Traslados 100% privados, con recibimiento nominativo y vehículo climatizado. El precio es por vehículo, no por persona, y adaptamos la recogida si el vuelo se retrasa.",
+  "excursionsTitle": "Actividades y excursiones guiadas en Lanzarote",
+  "excursionsIntro": "Excursiones, actividades y visitas guiadas para descubrir lo mejor de Lanzarote en grupos reducidos y solo en español.",
+  "excursionsText": "Organizamos visitas guiadas sin intermediarios, con recogida en su alojamiento y grupos reducidos (máximo 14 personas).\n\nCada ruta está pensada para disfrutar Timanfaya, los Jameos, César Manrique y los rincones menos masificados de la isla, con tiempo suficiente y explicaciones claras.",
+  "excursionsHeroImage": "https://wdnviethdarcmneghhqv.supabase.co/storage/v1/object/public/uploads/home/excursions-playa.jpg",
+  "blogTitle": "Blog Lanzarote",
+  "blogIntro": "Ideas y consejos para aprovechar al máximo su visita a la isla.",
+  "blogText": "En nuestro blog encontrará guías prácticas, recomendaciones de temporada y respuestas a las dudas más habituales antes de reservar una excursión o un traslado.\n\nActualizamos los contenidos para ayudarle a planificar mejor su estancia en Lanzarote.",
+  "blogHeroImage": "/images/heroes/blog.jpg",
+  "cruiseHeadline": "Excursiones para cruceros en las Islas Canarias",
+  "cruiseIntro": "Aproveche las escalas de su crucero en Lanzarote (temporada 2026-2027, Puerto de Los Mármoles) y conozca la isla con nuestras excursiones adaptadas a su all-aboard.",
+  "cruiseText": "Diseñamos shore excursions pensadas para el tiempo real de su escala: recogida en el muelle, recorrido por los puntos imprescindibles y regreso con margen al barco.\n\nConsulte el calendario de escalas, elija su compañía y reserve la excursión que mejor encaje con su horario de all-aboard.",
+  "cruiseHeroImage": "https://wdnviethdarcmneghhqv.supabase.co/storage/v1/object/public/uploads/home/cruceros-gaviota.jpg",
+  "transferTitle": "Traslados privados aeropuerto ↔ hotel",
+  "transferIntro": "Disfrute más de la isla y menos del aeropuerto, reservando un traslado privado a su hotel. Nuestro chófer le esperará en la terminal de llegadas.",
+  "transferText": "Ofrecemos traslados privados puerta a puerta entre el Aeropuerto de Lanzarote (ACE) y los principales núcleos turísticos: Playa Blanca, Puerto del Carmen, Costa Teguise, Puerto Calero y más.\n\nPuede reservar solo ida, solo vuelta o ida y vuelta. El precio es por vehículo (no por persona) y el chófer le espera con un cartel con su nombre.\n\nSi su vuelo se retrasa, adaptamos la recogida. Indíquenos número de vuelo y hotel al reservar para una llegada sin estrés.",
+  "transferHeroImage": "https://wdnviethdarcmneghhqv.supabase.co/storage/v1/object/public/uploads/home/traslados-aeropuerto.jpg",
+  "companyLegalName": "Lanzarote Experience Tours S.L.U.",
+  "companyTaxId": "B76071836",
+  "companyAddress": "Calle Calderetas, 100, 35550 San Bartolomé - Lanzarote",
+  "taxRate": 7,
+  "bannerEs": "Traslados privados aeropuerto ↔ hotel. Empresa familiar de Lanzarote. Chófer con cartel y tarifa por vehículo. Gracias por apoyar el comercio local.",
+  "bannerEn": "Private airport transfers in Lanzarote. A local family business. Named meet & greet and a fixed vehicle fare. Thank you for supporting local trade.",
+  "bannerDe": "Private Flughafentransfers auf Lanzarote. Lokales Familienunternehmen. Fahrer mit Namensschild und Festpreis pro Fahrzeug. Danke für die Unterstützung des lokalen Handels.",
+  "homeHeroPosition": "50% 42%",
+  "aboutHeroPosition": "45% 35%",
+  "excursionsHeroPosition": "28% 42%",
+  "blogHeroPosition": "50% 40%",
+  "cruiseHeroPosition": "50% 45%",
+  "transferHeroPosition": "50% 45%",
+  "housesHeroImage": "/images/heroes/casas-vacacionales.jpg",
+  "housesHeroPosition": "50% 45%",
+  "contactHeroImage": "/images/home/aeropuerto.jpg",
+  "contactHeroPosition": "45% 35%",
+  "excursionsFaqTitle": "Preguntas frecuentes sobre nuestras excursiones en Lanzarote",
+  "excursionsFaqs": [
+    {
+      "id": "exc-faq-1",
+      "question": "¿Cuándo recibiré el bono para la excursión?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_19\" data-hveid=\"CAAIChAH\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Una vez finalizado el proceso de compra, recibirás un correo electrónico automático con la confirmación y tu número de referencia. En ese mismo momento, podrás descargar tu factura e imprimir el bono que debes entregar al guía el día del tour.</div>"
+    },
+    {
+      "id": "exc-faq-2",
+      "question": "¿Qué pasa si pierdo o me olvido mi bono impreso?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_1g\" data-hveid=\"CAAIChAL\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">¡No te preocupes en absoluto, no es ningún problema! No es obligatorio traerlo en papel si lo has perdido; bastará con que le muestres al guía el bono digital directamente a través de tu teléfono móvil.</div>"
+    },
+    {
+      "id": "exc-faq-3",
+      "question": "¿Cómo consigo la factura por el servicio contratado?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_1n\" data-hveid=\"CAAIChAP\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">La transparencia es fundamental para nosotros. Podrás descargar tanto tu bono de excursión como tu factura oficial de manera inmediata en cuanto finalices el proceso de compra en nuestra web.</div>"
+    },
+    {
+      "id": "exc-faq-4",
+      "question": "¿Cuáles son las formas de pago disponibles?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_1u\" data-hveid=\"CAAIChAT\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Para tu total comodidad y seguridad, aceptamos pagos con tarjeta de crédito/débito, PayPal y Stripe. Nuestro sistema de pago está totalmente encriptado y protegido.</div>"
+    },
+    {
+      "id": "exc-faq-5",
+      "question": "¿Dónde será el punto de encuentro con el guía?",
+      "answer": "<ul class=\"KI3fJ\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"wiLEJc#NS0kde\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_21\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\"><li class=\"Z1qcYe\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"oSLmPe#HokZ0d\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_22\" data-hveid=\"CAAIChAY\" data-complete=\"true\" data-sae=\"\" style=\"margin: 0px 0px 12px; border-bottom: 0px rgb(10, 10, 10);\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px 0px 12px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\"><div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_23\" data-hveid=\"CAAIChAZ\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"border-bottom: 0px rgb(10, 10, 10);\"><span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_24\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">Si te alojas en la isla:</span> Te recogemos directamente en tu alojamiento en las principales zonas turísticas de Lanzarote. Unos días antes del tour te confirmaremos la hora exacta.</div></li><li class=\"Z1qcYe\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"oSLmPe#HokZ0d\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2a\" data-hveid=\"CAAIChAc\" data-complete=\"true\" data-sae=\"\" style=\"border-bottom: 0px rgb(10, 10, 10);\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\"><div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2b\" data-hveid=\"CAAIChAd\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"border-bottom: 0px rgb(10, 10, 10);\"><span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2c\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">Si vienes en un crucero:</span> El punto de encuentro será el mismo muelle donde atraque tu barco, justo una vez hayas pasado la oficina de control de la policía portuaria. ¡Allí estaremos esperándote con los brazos abiertos!</div></li></ul>"
+    },
+    {
+      "id": "exc-faq-6",
+      "question": "¿Están incluidas las entradas a los centros turísticos?",
+      "answer": "<ul class=\"KI3fJ\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"wiLEJc#NS0kde\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2j\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\"><li class=\"Z1qcYe\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"oSLmPe#HokZ0d\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2k\" data-hveid=\"CAAIChAi\" data-complete=\"true\" data-sae=\"\" style=\"margin: 0px 0px 12px; border-bottom: 0px rgb(10, 10, 10);\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px 0px 12px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\"><div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2l\" data-hveid=\"CAAIChAj\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"border-bottom: 0px rgb(10, 10, 10);\"><span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2m\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">En nuestras excursiones compartidas:</span> Sí, todas las entradas a los lugares incluidos en la ruta están totalmente cubiertas en el precio final.</div></li><li class=\"Z1qcYe\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"oSLmPe#HokZ0d\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2s\" data-hveid=\"CAAIChAm\" data-complete=\"true\" data-sae=\"\" style=\"border-bottom: 0px rgb(10, 10, 10);\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\"><div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2t\" data-hveid=\"CAAIChAn\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"border-bottom: 0px rgb(10, 10, 10);\"><span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2u\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">En nuestras excursiones privadas:</span> Las entradas <span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2v\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">no están incluidas</span> en el precio base. El día del tour podrás abonarlas cómodamente en efectivo o tarjeta. Lo mejor de todo es que, al ir con nosotros, <span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_2w\" data-complete=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">te evitamos por completo las largas colas en las taquillas</span>, accediendo de forma rápida.</div></li></ul>"
+    },
+    {
+      "id": "exc-faq-7",
+      "question": "¿Cuáles son los idiomas de las excursiones?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_33\" data-hveid=\"CAAIChAr\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Realizamos excursiones en español, inglés y alemán. En nuestra familia odiamos los tours multilingües caóticos donde el guía cambia constantemente de idioma. Por eso, <span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_34\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">jamás mezclamos idiomas en un mismo vehículo</span>; disfrutarás del viaje enteramente en tu lengua elegida.</div>"
+    },
+    {
+      "id": "exc-faq-8",
+      "question": "¿Qué tipo de vehículos utilizamos para las excursiones?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_3b\" data-hveid=\"CAAIChAv\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Utilizamos minibuses modernos y climatizados, ideales para viajar en grupos reducidos y hacer recogidas rápidas. Es importante que sepas que actualmente <span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_3c\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">no disponemos de vehículos adaptados para sillas de ruedas</span>.</div>"
+    },
+    {
+      "id": "exc-faq-9",
+      "question": "¿Cuál es la política de cancelación?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_3j\" data-hveid=\"CAAIChAz\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Entendemos que los planes pueden cambiar. Puedes modificar el día de tu excursión o cancelar el viaje de forma gratuita <span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_3k\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">hasta 24 horas antes</span> de la hora de inicio y te devolveremos el dinero. Lamentablemente, en el caso de cancelaciones con menos de 24 horas de antelación o si no te presentas, no habrá devolución.</div>"
+    },
+    {
+      "id": "exc-faq-10",
+      "question": "¿Con cuánta anticipación debo reservar mi excursión?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_3r\" data-hveid=\"CAAIChA3\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Te recomendamos que hagas tu reserva lo antes posible. Al viajar en grupos pequeños, las plazas son muy limitadas y suelen agotarse con rapidez, especialmente en temporada alta.</div>"
+    },
+    {
+      "id": "exc-faq-11",
+      "question": "¿Cómo puedo reservar un tour privado para mi familia, grupo de amigos, instituto o asociación?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_3y\" data-hveid=\"CAAIChA7\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">¡Nos encanta organizar experiencias a medida! Ofrecemos tours privados que puedes reservar directamente a través de nuestra web. Si tienes peticiones especiales o prefieres un diseño personalizado, ponte en contacto con nosotros por correo electrónico y te ayudaremos con todo el cariño.</div>"
+    },
+    {
+      "id": "exc-faq-12",
+      "question": "Si me olvido algo en el autobús, ¿cómo puedo recuperarlo?",
+      "answer": "<div class=\"n6owBd awi2gc\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"TDBkbc#Ml18Xb\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_45\" data-hveid=\"CAAIChA_\" data-complete=\"true\" data-processed=\"true\" aria-owns=\"action-menu-parent-container\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 400; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-size: 16px; border-bottom: 0px rgb(10, 10, 10);\">Las prisas del viaje a veces nos juegan una mala pasada. Si olvidas algún objeto personal en nuestro vehículo, ponte en contacto lo antes posible con nuestra oficina llamando al teléfono <span class=\"rQesXe MPyX\" data-sfc-cp=\"\" jsaction=\"\" jscontroller=\"tP2kf#s32ZS\" data-sfc-root=\"ep\" jsuid=\"Tgcxzb_46\" data-complete=\"true\" data-processed=\"true\" data-copy-service-computed-style=\"font-family: &quot;Google Sans&quot;, Arial, sans-serif; font-size: 16px; font-weight: 700; margin: 0px; text-decoration: none; border-bottom: 0px rgb(10, 10, 10);\" style=\"font-weight: 700; border-bottom: 0px rgb(10, 10, 10);\">0034 646 08 05 85</span> y haremos todo lo posible por localizártelo.</div></div>"
+    }
+  ],
+  "excursionsBlocksTitle": "Lanzarote, una isla para descubrir",
+  "excursionsBlocksIntro": "Lanzarote es una isla donde su paisaje volcánico, negro y rojo, hace que te sientas en un mundo diferente. Vas a encontrar una tierra de silencio y tranquilidad que te hará desconectar y recargarte de energía. Una isla donde te sentirás en casa por el trato de sus gentes hospitalarias, que han sabido respetar el paisaje y aprender a sobrevivir en un lugar donde el agua escasea.",
+  "excursionsBlocks": [
+    {
+      "id": "exc-block-1",
+      "layout": "featured",
+      "title": "Parque Nacional de Timanfaya: un mundo primigenio",
+      "text": "Timanfaya es otro mundo, con un paisaje marciano resultado de las erupciones ocurridas entre 1730 y 1736, y de nuevo en 1824, donde la escasa vegetación, la variedad de formas de las lavas, y sus colores primigenios crean uno de los panoramas que más impresionan de todas las islas Canarias.",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/parque-nacional-de-timanfaya.jpg",
+      "linkText": "Parque Nacional de Timanfaya",
+      "linkHref": "https://www.lanzaroteexperiencetours.com/blog/parque-nacional-de-timanfaya/"
+    },
+    {
+      "id": "exc-block-2",
+      "layout": "card",
+      "title": "Jameos del Agua: un lugar para enamorarse",
+      "text": "Jameos del Agua es un espacio único en el mundo ideado por César Manrique y Jesús Soto. Siente la armonía, la belleza, la paz y el sosiego de este túnel volcánico.",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/jameos-del-agua.jpg",
+      "linkText": "Jameos del Agua",
+      "linkHref": "https://www.lanzaroteexperiencetours.com/blog/los-jameos-del-agua-en-lanzarote/"
+    },
+    {
+      "id": "exc-block-3",
+      "layout": "card",
+      "title": "Cueva de los Verdes: una cueva que sorprende",
+      "text": "Hay pocos lugares como la Cueva de los Verdes. La belleza y singularidad de esta cueva la confirman como una de las maravillas más sorprendentes que esconden Lanzarote.",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/cueva-de-los-verdes.jpg",
+      "linkText": "Cueva de los verdes",
+      "linkHref": "https://www.lanzaroteexperiencetours.com/blog/cueva-de-los-verdes-excursiones-en-lanzarote/"
+    },
+    {
+      "id": "exc-block-4",
+      "layout": "card",
+      "title": "Mirador del Río: un regalo para la vista",
+      "text": "Se encuentra en la cima del imponente acantilado de Famara, cerca de una antigua batería militar del siglo XIX. Desde la terraza se disfruta las vistas sobre la isla de La Graciosa y los islotes del Archipiélago Chinijo.",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/mirador-del-rio-la-graciosa.jpg",
+      "linkText": "",
+      "linkHref": ""
+    },
+    {
+      "id": "exc-block-5",
+      "layout": "card",
+      "title": "Jardín de Cactus: un jardín en una antigua rofera",
+      "text": "El Jardín de Cactus, fácilmente reconocible desde la carretera gracias al gran cactus metálico que hay a su entrada, es la última obra realizada por César Manrique en la isla.",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/jardin-de-cactus.jpg",
+      "linkText": "",
+      "linkHref": ""
+    },
+    {
+      "id": "exc-block-6",
+      "layout": "card",
+      "title": "El Golfo y el Lago Verde: un cráter a nivel del mar",
+      "text": "El Charco de los Clicos o Lago Verde se encuentra en El Golfo, un volcán en el litoral de la costa oeste de Lanzarote que se formó durante las erupciones de 1730, donde la erosión de viento y mar le han configurado su silueta de teatro romano abierto al mar",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/lago-verde-charco-clicos-el-golfo.jpg",
+      "linkText": "",
+      "linkHref": ""
+    },
+    {
+      "id": "exc-block-7",
+      "layout": "card",
+      "title": "Fundación César Manrique: Simbiosis de naturaleza y arte",
+      "text": "La Fundación César Manrique se ubica en la casa-estudio que habitó el artista hasta 1988. Es quizás la obra que mejor representa sus ideales personales y artísticos.",
+      "image": "https://www.lanzaroteexperiencetours.com/dist/images/lanzarote/fundacion-cesar-manrique.jpg",
+      "linkText": "",
+      "linkHref": ""
+    }
+  ],
+  "transferFaqTitle": "Preguntas frecuentes sobre nuestros traslados en Lanzarote",
+  "transferFaqs": [
+    {
+      "id": "tr-faq-1",
+      "question": "¿Dónde encontraré a mi chófer?",
+      "answer": "Todos nuestros traslados son servicios privados. Su conductor está en exclusividad para usted y estará esperando en la terminal con un cartel con su nombre para llevarle a su alojamiento o destino. Equipaje especial. Se acepta equipaje especial siempre que nos lo indique en la reserva para que podamos organizar el transporte adecuado. Las sillas para bebés y alzadores son gratuitos. Cada bicicleta tiene un costo adicional de 10.00 € por viaje que hay que abonar en efectivo al conductor"
+    },
+    {
+      "id": "tr-faq-2",
+      "question": "¿Qué sucede si no puedo encontrar a mi chófer?",
+      "answer": "En el caso improbable de que no localice inmediatamente a su conductor, le pedimos que nos llame a cualquiera de números teléfonos. Nos pondremos en contacto con el conductor y lo enviaremos directamente a su ubicación."
+    },
+    {
+      "id": "tr-faq-3",
+      "question": "¿Qué pasa si mi vuelo tiene un retraso?",
+      "answer": "Cuando usted realiza su reserva debe indicar el número de su vuelo para que nuestro chófer pueda comprobar el estado de su vuelo y le recoja a la hora correcta."
+    },
+    {
+      "id": "tr-faq-4",
+      "question": "¿Cómo funciona la política de cancelación?",
+      "answer": "No hay gastos de cancelación hasta 24 horas antes del servicio."
+    },
+    {
+      "id": "tr-faq-5",
+      "question": "¿Cuándo es mejor reservar mi traslado?",
+      "answer": "Le sugerimos que haga la reserva tan pronto como conozca los detalles de su vuelo."
+    },
+    {
+      "id": "tr-faq-6",
+      "question": "¿Cómo puedo recuperar un artículo olvidado en el vehículo?",
+      "answer": "Si cree que podría haber dejado algún artículo en el vehículo, póngase en contacto con nuestro Equipo de Servicio al Cliente. Confíe en nuestra profesionalidad para organizar su traslado en Lanzarote."
+    }
+  ],
+  "transferBlocksTitle": "",
+  "transferBlocksIntro": "",
+  "transferBlocks": [],
+  "aboutFaqTitle": "",
+  "aboutFaqs": [],
+  "aboutBlocksTitle": "",
+  "aboutBlocksIntro": "",
+  "aboutBlocks": [],
+  "blogFaqTitle": "",
+  "blogFaqs": [],
+  "blogBlocksTitle": "",
+  "blogBlocksIntro": "",
+  "blogBlocks": [],
+  "cruiseFaqTitle": "",
+  "cruiseFaqs": [],
+  "cruiseBlocksTitle": "",
+  "cruiseBlocksIntro": "",
+  "cruiseBlocks": [],
+  "housesFaqTitle": "",
+  "housesFaqs": [],
+  "housesBlocksTitle": "",
+  "housesBlocksIntro": "",
+  "housesBlocks": [],
+  "contactFaqTitle": "",
+  "contactFaqs": [],
+  "contactBlocksTitle": "",
+  "contactBlocksIntro": "",
+  "contactBlocks": []
+}

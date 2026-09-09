@@ -1,0 +1,174 @@
+"use client";
+
+import { Ban, CheckCircle2, CircleDot, Clock3, Wallet } from "lucide-react";
+import type { BookingStatus, PaymentStatus } from "@/types";
+
+const config: Record<
+  BookingStatus,
+  { label: string; className: string; Icon: typeof Ban }
+> = {
+  pending: {
+    label: "Pendiente",
+    className: "bg-amber-100 text-amber-900 ring-amber-200",
+    Icon: Clock3,
+  },
+  confirmed: {
+    label: "Confirmada",
+    className: "bg-emerald-100 text-emerald-900 ring-emerald-200",
+    Icon: CircleDot,
+  },
+  completed: {
+    label: "Completada",
+    className: "bg-sky-100 text-sky-900 ring-sky-200",
+    Icon: CheckCircle2,
+  },
+  cancelled: {
+    label: "Cancelado",
+    className:
+      "bg-red-600 text-white ring-2 ring-red-700 shadow-md shadow-red-600/30",
+    Icon: Ban,
+  },
+};
+
+const paymentConfig: Record<
+  PaymentStatus,
+  { label: string; className: string }
+> = {
+  paid: {
+    label: "Pagado",
+    className: "bg-emerald-100 text-emerald-900 ring-emerald-200",
+  },
+  unpaid: {
+    label: "No pagado",
+    className: "bg-rose-100 text-rose-900 ring-rose-200",
+  },
+  partial: {
+    label: "Pago parcial",
+    className: "bg-amber-100 text-amber-900 ring-amber-200",
+  },
+  pay_on_day: {
+    label: "Pago el día",
+    className: "bg-sky-100 text-sky-900 ring-sky-200",
+  },
+  refunded: {
+    label: "Devuelto (Stripe)",
+    className: "bg-violet-100 text-violet-900 ring-violet-200",
+  },
+};
+
+/**
+ * Solo se considera "devuelto" si existe stripeRefundId (refund real en Stripe).
+ * Cancelada + tarjeta cobrada sin refund → pendiente.
+ */
+export function resolvePaymentDisplay(input: {
+  paymentStatus: PaymentStatus;
+  status?: BookingStatus;
+  amountPaidCard?: number;
+  stripeRefundId?: string;
+}): {
+  label: string;
+  className: string;
+  kind: "normal" | "pending_refund" | "refunded";
+} {
+  if (input.stripeRefundId) {
+    return {
+      label: "Devuelto (Stripe)",
+      className: paymentConfig.refunded.className,
+      kind: "refunded",
+    };
+  }
+
+  const cardPaid = (input.amountPaidCard || 0) > 0;
+  if (input.status === "cancelled" && cardPaid) {
+    return {
+      label: "Pendiente refund Stripe",
+      className: "bg-amber-100 text-amber-950 ring-amber-300",
+      kind: "pending_refund",
+    };
+  }
+
+  // "refunded" sin stripeRefundId = marca antigua incorrecta → no mostrar como devuelto
+  if (input.paymentStatus === "refunded" && !cardPaid) {
+    return {
+      label: "Devuelto (Stripe)",
+      className: paymentConfig.refunded.className,
+      kind: "refunded",
+    };
+  }
+
+  const statusKey =
+    input.paymentStatus === "refunded" ? "paid" : input.paymentStatus;
+  const item = paymentConfig[statusKey] || paymentConfig.unpaid;
+  return { label: item.label, className: item.className, kind: "normal" };
+}
+
+export function BookingStatusBadge({
+  status,
+  size = "md",
+}: {
+  status: BookingStatus;
+  size?: "sm" | "md";
+}) {
+  const item = config[status] || config.pending;
+  const Icon = item.Icon;
+  const sizing =
+    size === "sm"
+      ? "gap-1 px-2 py-0.5 text-[10px]"
+      : "gap-1.5 px-2.5 py-1 text-xs";
+  const iconSize = size === "sm" ? "h-3 w-3" : "h-3.5 w-3.5";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-md font-bold uppercase tracking-wide ring-1 ${item.className} ${sizing}`}
+    >
+      <Icon className={iconSize} aria-hidden />
+      {item.label}
+    </span>
+  );
+}
+
+export function PaymentStatusBadge({
+  status,
+  size = "md",
+  bookingStatus,
+  amountPaidCard,
+  stripeRefundId,
+}: {
+  status: PaymentStatus;
+  size?: "sm" | "md";
+  bookingStatus?: BookingStatus;
+  amountPaidCard?: number;
+  stripeRefundId?: string;
+}) {
+  const display = resolvePaymentDisplay({
+    paymentStatus: status,
+    status: bookingStatus,
+    amountPaidCard,
+    stripeRefundId,
+  });
+  const sizing =
+    size === "sm"
+      ? "gap-1 px-2 py-0.5 text-[10px]"
+      : "gap-1.5 px-2.5 py-1 text-xs";
+  const iconSize = size === "sm" ? "h-3 w-3" : "h-3.5 w-3.5";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-md font-bold uppercase tracking-wide ring-1 ${display.className} ${sizing}`}
+    >
+      <Wallet className={iconSize} aria-hidden />
+      {display.label}
+    </span>
+  );
+}
+
+export function paymentStatusLabel(status: PaymentStatus): string {
+  return paymentConfig[status]?.label || status;
+}
+
+export function bookingRowClassName(status: BookingStatus): string {
+  if (status === "cancelled") {
+    return "bg-red-50 hover:bg-red-100/80";
+  }
+  return "hover:bg-sky-soft/40";
+}

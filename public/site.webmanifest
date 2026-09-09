@@ -1,0 +1,19 @@
+{
+  "name": "Lanzarote Transfers",
+  "short_name": "LZ Transfers",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1a5fa8",
+  "background_color": "#0c1b33",
+  "display": "standalone"
+}
