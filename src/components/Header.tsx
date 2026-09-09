@@ -44,7 +44,12 @@ export function Header() {
           href={href("/")}
           className="shrink-0 transition hover:opacity-90"
         >
-          <BrandLogo variant="onDark" priority />
+          <BrandLogo
+            variant="onDark"
+            priority
+            className="h-12 w-[230px] md:h-16 md:w-[300px]"
+            sizes="300px"
+          />
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:flex">

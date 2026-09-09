@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -14,6 +13,7 @@ import {
   Send,
   X,
 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useLocale } from "@/components/LocaleProvider";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -202,15 +202,7 @@ export function FloatingHelp() {
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="relative h-10 w-16 overflow-hidden rounded-md bg-white">
-                <Image
-                  src="/images/brand/logo-green.png"
-                  alt=""
-                  fill
-                  className="object-contain p-1"
-                  sizes="40px"
-                />
-              </div>
+              <BrandLogo variant="onDark" className="h-8 w-[140px]" sizes="140px" />
               <div>
                 <p className="text-sm font-bold">{dict.contactWidget.title}</p>
                 <p className="text-xs text-white/70">{dict.contactWidget.slug}</p>
