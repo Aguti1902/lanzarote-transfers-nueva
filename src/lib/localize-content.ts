@@ -14,6 +14,10 @@ import {
 } from "@/lib/supabase/cms-store";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import {
+  dbGetContentTranslations,
+  dbSaveContentTranslations,
+} from "@/lib/supabase/postgres";
+import {
   mergeSettingsOverlay,
   pickSettingsTranslations,
   SETTINGS_BLOCKS_LIST_KEYS,
@@ -108,8 +112,12 @@ function loadTranslations(
   }
 
   const reader = fresh ? readCmsJsonFresh : readCmsJson;
-  const pending = reader<ContentTranslations>(`i18n/${locale}.json`).then(
-    (data) => ({
+  const pending = (async () => {
+    const fromDb = await dbGetContentTranslations(locale);
+    const data =
+      (fromDb as ContentTranslations | null) ??
+      (await reader<ContentTranslations>(`i18n/${locale}.json`));
+    return {
       ...emptyContentTranslations(),
       ...data,
       settings: data?.settings || {},
@@ -118,8 +126,8 @@ function loadTranslations(
       transfers: data?.transfers || { highlights: [] },
       shoreTours: data?.shoreTours || {},
       cruise: data?.cruise || emptyContentTranslations().cruise,
-    })
-  );
+    };
+  })();
 
   if (!fresh && !isSupabaseConfigured()) {
     translationCache.set(locale, pending);
@@ -137,7 +145,9 @@ export async function saveContentTranslations(
   locale: TranslatedLocale,
   data: ContentTranslations
 ): Promise<void> {
-  await writeCmsJson(`i18n/${locale}.json`, data);
+  if (!(await dbSaveContentTranslations(locale, data))) {
+    await writeCmsJson(`i18n/${locale}.json`, data);
+  }
   clearContentTranslationCache();
 }
 

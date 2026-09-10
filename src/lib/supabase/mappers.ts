@@ -29,6 +29,12 @@ export function bookingToRow(b: Booking) {
     cancellation_fee: b.cancellationFee ?? null,
     locale: b.locale ?? null,
     pickup_zone: b.pickupZone ?? null,
+    group_id: b.groupId ?? null,
+    stripe_checkout_session_id: b.stripeCheckoutSessionId ?? null,
+    stripe_payment_intent_id: b.stripePaymentIntentId ?? null,
+    stripe_refund_id: b.stripeRefundId ?? null,
+    stripe_refunded_at: b.stripeRefundedAt ?? null,
+    stripe_refund_amount: b.stripeRefundAmount ?? null,
     customer: b.customer,
     transfer: b.transfer ?? null,
     minibus: b.minibus ?? null,
@@ -63,6 +69,17 @@ export function rowToBooking(row: Record<string, unknown>): Booking {
       row.cancellation_fee == null ? undefined : Number(row.cancellation_fee),
     locale: (row.locale as string) || undefined,
     pickupZone: (row.pickup_zone as string) || undefined,
+    groupId: (row.group_id as string) || undefined,
+    stripeCheckoutSessionId:
+      (row.stripe_checkout_session_id as string) || undefined,
+    stripePaymentIntentId:
+      (row.stripe_payment_intent_id as string) || undefined,
+    stripeRefundId: (row.stripe_refund_id as string) || undefined,
+    stripeRefundedAt: (row.stripe_refunded_at as string) || undefined,
+    stripeRefundAmount:
+      row.stripe_refund_amount == null
+        ? undefined
+        : Number(row.stripe_refund_amount),
     customer: row.customer as Booking["customer"],
     transfer: (row.transfer as Booking["transfer"]) || undefined,
     minibus: (row.minibus as Booking["minibus"]) || undefined,
@@ -85,6 +102,8 @@ export function invoiceToRow(inv: Invoice) {
     related_invoice_id: inv.relatedInvoiceId ?? null,
     notes: inv.notes ?? null,
     status: inv.status,
+    legacy_hash: inv.legacyHash ?? null,
+    payment_method: inv.paymentMethod ?? null,
   };
 }
 
@@ -104,6 +123,8 @@ export function rowToInvoice(row: Record<string, unknown>): Invoice {
     relatedInvoiceId: (row.related_invoice_id as string) || undefined,
     notes: (row.notes as string) || undefined,
     status: row.status as Invoice["status"],
+    legacyHash: (row.legacy_hash as string) || undefined,
+    paymentMethod: (row.payment_method as string) || undefined,
   };
 }
 

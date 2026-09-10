@@ -4,7 +4,8 @@ import {
   getCruiseGroups,
   upsertCruiseGroup,
 } from "@/lib/admin-extras";
-import { getBookings, updateBooking } from "@/lib/bookings";
+import { updateBooking } from "@/lib/bookings";
+import { getBookingsForCruiseGroups } from "@/lib/hub/bookings";
 import {
   findSailingForPortCall,
   getCruiseShoreTourById,
@@ -131,7 +132,7 @@ export async function syncCruiseGroupCapacity(
     throw new Error("Grupo no encontrado");
   }
 
-  const bookings = await getBookings();
+  const bookings = await getBookingsForCruiseGroups();
   const livePax = livePaxForGroup(group, bookings, groups);
   const maxPax = group.maxPax != null ? Number(group.maxPax) : undefined;
 
@@ -299,7 +300,7 @@ export async function assignBookingToCruiseGroup(
     groups = [...groups, created];
   }
 
-  const bookings = await getBookings();
+  const bookings = await getBookingsForCruiseGroups();
   let target =
     pool.find((g) => {
       if (g.status !== "open") return false;
@@ -315,7 +316,7 @@ export async function assignBookingToCruiseGroup(
     const synced = await syncCruiseGroupCapacity(seed.id);
     spawned = synced.spawned;
     const refreshed = await getCruiseGroups();
-    const bookingsNow = await getBookings();
+    const bookingsNow = await getBookingsForCruiseGroups();
     target =
       refreshed.find(
         (g) =>

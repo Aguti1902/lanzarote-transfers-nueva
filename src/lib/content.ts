@@ -25,6 +25,12 @@ import {
   readLocalCmsJson,
   writeCmsJson,
 } from "@/lib/supabase/cms-store";
+import {
+  dbGetSettings,
+  dbGetTransfers,
+  dbSaveSettings,
+  dbSaveTransfers,
+} from "@/lib/supabase/postgres";
 import { tourMatchesSlug } from "@/i18n/tour-slugs";
 import { SETTINGS_STRING_KEYS } from "@/lib/settings-i18n";
 import {
@@ -271,7 +277,8 @@ async function withTransferHighlightSeed(
 }
 
 export const getTransfersData = cache(async (): Promise<TransfersData> => {
-  const data = await readJson<TransfersData>("transfers.json");
+  const fromDb = await dbGetTransfers();
+  const data = fromDb ?? (await readJson<TransfersData>("transfers.json"));
   return withTransferHighlightSeed(data);
 });
 
@@ -280,13 +287,15 @@ export async function getTransferDestinations(): Promise<TransferDestination[]> 
 }
 
 export async function saveTransfersData(data: TransfersData): Promise<void> {
+  if (await dbSaveTransfers(data)) return;
   await writeJson("transfers.json", data);
 }
 
 export async function upsertTransfer(
   dest: TransferDestination
 ): Promise<TransferDestination> {
-  const data = await readJsonFresh<TransfersData>("transfers.json");
+  const fromDb = await dbGetTransfers();
+  const data = fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
   const idx = data.destinations.findIndex((d) => d.id === dest.id);
   if (idx === -1) data.destinations.push(dest);
   else data.destinations[idx] = dest;
@@ -297,7 +306,9 @@ export async function upsertTransfer(
 export async function createTransfer(
   input: Partial<TransferDestination> & Pick<TransferDestination, "name">
 ): Promise<TransferDestination> {
-  const data = await readJsonFresh<TransfersData>("transfers.json");
+  const fromDb = await dbGetTransfers();
+  const data =
+    fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
   const baseSlug = slugify(input.slug || input.name);
   let slug = baseSlug;
   let n = 2;
@@ -320,7 +331,9 @@ export async function createTransfer(
 }
 
 export async function deleteTransfer(id: string): Promise<boolean> {
-  const data = await readJsonFresh<TransfersData>("transfers.json");
+  const fromDb = await dbGetTransfers();
+  const data =
+    fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
   const next = data.destinations.filter((d) => d.id !== id);
   if (next.length === data.destinations.length) return false;
   data.destinations = next;
@@ -331,7 +344,9 @@ export async function deleteTransfer(id: string): Promise<boolean> {
 export async function updateTransferHighlights(
   highlights: string[]
 ): Promise<string[]> {
-  const data = await readJsonFresh<TransfersData>("transfers.json");
+  const fromDb = await dbGetTransfers();
+  const data =
+    fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
   data.highlights = highlights;
   await saveTransfersData(data);
   return highlights;
@@ -570,7 +585,9 @@ function scrubSettingsHtml(settings: SiteSettings): SiteSettings {
 }
 
 export const getSettings = cache(async (): Promise<SiteSettings> => {
-  const stored = await readJson<Partial<SiteSettings>>("settings.json");
+  const stored =
+    (await dbGetSettings()) ??
+    (await readJson<Partial<SiteSettings>>("settings.json"));
   return scrubSettingsHtml({
     ...defaultSettings,
     ...stored,
@@ -610,5 +627,7 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
 });
 
 export async function saveSettings(settings: SiteSettings): Promise<void> {
-  await writeJson("settings.json", scrubSettingsHtml(settings));
+  const next = scrubSettingsHtml(settings);
+  if (await dbSaveSettings(next)) return;
+  await writeJson("settings.json", next);
 }

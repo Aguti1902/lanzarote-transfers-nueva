@@ -1,6 +1,7 @@
 import { cache } from "react";
 import type { Locale } from "@/i18n/config";
 import { readCmsJson } from "@/lib/supabase/cms-store";
+import { dbGetReviews } from "@/lib/supabase/postgres";
 
 export type ReviewSource = "tripadvisor" | "customer" | "web";
 
@@ -33,6 +34,8 @@ export interface ReviewsData {
 
 /** Deduplica lecturas de reviews en el mismo request (layout + página). */
 const loadReviews = cache(async (): Promise<ReviewsData> => {
+  const fromDb = await dbGetReviews();
+  if (fromDb) return fromDb;
   return readCmsJson<ReviewsData>("reviews.json");
 });
 
@@ -57,10 +60,13 @@ function sortForLocale(reviews: TravelerReview[], locale: Locale) {
 }
 
 export async function getTripadvisorMeta(): Promise<TripadvisorMeta> {
+  const data = await loadReviews();
+  if (data.tripadvisor?.url || data.tripadvisor?.reviewCount) {
+    return data.tripadvisor;
+  }
   try {
     return await readCmsJson<TripadvisorMeta>("tripadvisor.json");
   } catch {
-    const data = await loadReviews();
     return data.tripadvisor;
   }
 }

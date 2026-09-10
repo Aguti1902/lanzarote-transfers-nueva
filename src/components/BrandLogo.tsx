@@ -11,7 +11,7 @@ export function BrandLogo({
   variant,
   className = "",
   priority,
-  sizes = "300px",
+  sizes = "210px",
 }: Props) {
   const onLight = variant === "onLight";
 

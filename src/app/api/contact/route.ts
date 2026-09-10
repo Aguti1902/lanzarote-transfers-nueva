@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readCmsJson, writeCmsJson } from "@/lib/supabase/cms-store";
 import { notifyContactMessage } from "@/lib/notify";
 import { sendContactAutoReply } from "@/lib/customer-emails";
+import { dbInsertContactMessage } from "@/lib/supabase/postgres";
 
 type ContactMessage = {
   id: string;
@@ -44,8 +45,12 @@ export async function POST(request: Request) {
       phone: phone || undefined,
       message,
     };
-    messages.unshift(entry);
-    await writeCmsJson("messages.json", messages);
+    const locale =
+      typeof body.locale === "string" ? body.locale : undefined;
+    if (!(await dbInsertContactMessage({ ...entry, locale }))) {
+      messages.unshift(entry);
+      await writeCmsJson("messages.json", messages);
+    }
 
     // No bloqueamos la respuesta si el correo falla
     void notifyContactMessage(entry).catch((err) => {

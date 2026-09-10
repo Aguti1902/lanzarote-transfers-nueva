@@ -2,6 +2,7 @@ import type { Booking, Invoice } from "@/types";
 import { updateBooking } from "@/lib/bookings";
 import { readCmsJson, writeCmsJson } from "@/lib/supabase/cms-store";
 import { isDepositMethod } from "@/lib/payments";
+import { dbListInvoices, dbSaveInvoices } from "@/lib/supabase/postgres";
 
 /** IGIC Canarias — fijo al 7% en facturas y abonos. */
 export const IGIC_RATE = 7;
@@ -31,14 +32,23 @@ export function splitIgic(
 }
 
 export async function getInvoices(): Promise<Invoice[]> {
-  try {
-    return await readCmsJson<Invoice[]>("invoices.json");
-  } catch {
-    return [];
-  }
+  const fromDb = await dbListInvoices();
+  const invoices = fromDb
+    ? fromDb
+    : await (async () => {
+        try {
+          return await readCmsJson<Invoice[]>("invoices.json");
+        } catch {
+          return [];
+        }
+      })();
+  const { raiseHubInvoiceFloor } = await import("@/lib/hub/floors");
+  await raiseHubInvoiceFloor(nextInvoiceNumber(invoices) - 1);
+  return invoices;
 }
 
 export async function saveInvoices(invoices: Invoice[]): Promise<void> {
+  if (await dbSaveInvoices(invoices)) return;
   await writeCmsJson("invoices.json", invoices);
 }
 
@@ -69,6 +79,12 @@ export function nextInvoiceNumber(invoices: Invoice[]): number {
     }
   }
   return max + 1;
+}
+
+async function allocateInvoiceNumber(invoices: Invoice[]): Promise<number> {
+  const localNext = nextInvoiceNumber(invoices);
+  const { tryHubNextNumber } = await import("@/lib/hub/sequences");
+  return (await tryHubNextNumber("invoice", localNext)) ?? localNext;
 }
 
 function formatInvoiceId(type: Invoice["type"], number: number): string {
@@ -108,7 +124,7 @@ export async function createInvoiceForBooking(
 
   const taxRate = IGIC_RATE;
   const invoices = await getInvoices();
-  const number = nextInvoiceNumber(invoices);
+  const number = await allocateInvoiceNumber(invoices);
   const id = formatInvoiceId("invoice", number);
 
   const invoiceTotal = invoiceAmountForBooking(booking);
@@ -198,7 +214,7 @@ export async function createCreditNoteForBooking(
   if (refundAmount <= 0 && !related) return null;
 
   const invoices = await getInvoices();
-  const number = nextInvoiceNumber(invoices);
+  const number = await allocateInvoiceNumber(invoices);
   const id = formatInvoiceId("credit_note", number);
 
   let credit: Invoice;

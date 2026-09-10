@@ -2,6 +2,10 @@ import type { Dictionary } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/config";
 import { locales } from "@/i18n/config";
 import { readCmsJson, readCmsJsonFresh, writeCmsJson } from "@/lib/supabase/cms-store";
+import {
+  dbGetUiTranslations,
+  dbSaveUiTranslations,
+} from "@/lib/supabase/postgres";
 
 export type UiTranslationOverrides = {
   es: Record<string, string>;
@@ -16,6 +20,8 @@ function emptyMaps(): UiTranslationOverrides {
 }
 
 export async function getUiTranslationOverrides(): Promise<UiTranslationOverrides> {
+  const fromDb = await dbGetUiTranslations();
+  if (fromDb) return fromDb;
   try {
     const data = await readCmsJson<Partial<UiTranslationOverrides>>(
       "uiTranslations.json"
@@ -33,11 +39,13 @@ export async function getUiTranslationOverrides(): Promise<UiTranslationOverride
 export async function saveUiTranslationOverrides(
   data: UiTranslationOverrides
 ): Promise<void> {
-  await writeCmsJson("uiTranslations.json", {
+  const payload = {
     es: data.es || {},
     en: data.en || {},
     de: data.de || {},
-  });
+  };
+  if (await dbSaveUiTranslations(payload)) return;
+  await writeCmsJson("uiTranslations.json", payload);
 }
 
 export async function updateUiTranslations(

@@ -1,5 +1,20 @@
 import Stripe from "stripe";
 import type { PaymentLink } from "@/types";
+import { EMAIL_BRAND } from "@/lib/email-layout";
+
+const CHECKOUT_LOGO_PATH = "/images/brand/lanzarote-transfers-dark.png";
+
+function checkoutBranding(
+  origin?: string
+): Stripe.Checkout.SessionCreateParams["branding_settings"] {
+  return {
+    display_name: EMAIL_BRAND,
+    logo: {
+      type: "url",
+      url: absoluteUrl(CHECKOUT_LOGO_PATH, origin),
+    },
+  };
+}
 
 let stripeClient: Stripe | null = null;
 
@@ -87,11 +102,13 @@ export async function createStripeCheckoutForPayment(
     ...(payment.bookingId ? [payment.bookingId] : []),
   ].filter((id, i, arr) => arr.indexOf(id) === i);
 
-  const session = await stripe.checkout.sessions.create({
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
     payment_method_types: ["card"],
     customer_email: payment.customerEmail || undefined,
     client_reference_id: payment.id,
+    expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
+    branding_settings: checkoutBranding(origin),
     line_items: [
       {
         quantity: 1,
@@ -99,7 +116,7 @@ export async function createStripeCheckoutForPayment(
           currency: "eur",
           unit_amount: amountCents,
           product_data: {
-            name: payment.concept.slice(0, 120) || "Pago Lanzarote Experience",
+            name: payment.concept.slice(0, 120) || `Pago ${EMAIL_BRAND}`,
             description: descriptionParts.join(" · ").slice(0, 500),
           },
         },
@@ -118,7 +135,19 @@ export async function createStripeCheckoutForPayment(
     },
     success_url: successUrl,
     cancel_url: cancelUrl,
-  });
+  };
+
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create(sessionParams);
+  } catch (error) {
+    console.warn(
+      "[stripe] branding_settings no aplicado, Checkout sin logo propio:",
+      error instanceof Error ? error.message : error
+    );
+    const { branding_settings: _ignored, ...fallback } = sessionParams;
+    session = await stripe.checkout.sessions.create(fallback);
+  }
 
   if (!session.url) {
     throw new Error("Stripe no devolvió URL de Checkout");

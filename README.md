@@ -11,14 +11,20 @@ npm run dev
 
 Abre [http://localhost:3000](http://localhost:3000).
 
-## Supabase (datos en producción)
+Sin claves de Supabase, la app usa `src/data/*.json` (modo local).
 
-Por defecto la app puede usar JSON locales. Con Supabase configurado, **reservas, CMS, facturas y uploads** pasan a la base de datos.
+## Proyecto Supabase nuevo
 
-1. Crea un proyecto en [supabase.com](https://supabase.com).
-2. En el SQL Editor, ejecuta el script:
-   `supabase/migrations/20260825170000_initial.sql`
-3. En Storage, crea un bucket público llamado `uploads` (y `cms` si lo usáis para el CMS).
+La fuente de verdad en producción es **Postgres**. Storage `uploads` sirve solo para fotos del panel. El bucket `cms` es un backup JSON opcional, no el catálogo vivo.
+
+No se puede crear el proyecto desde aquí. En [supabase.com](https://supabase.com):
+
+1. **New project** (región cercana, p. ej. `eu-west-1`).
+2. En el **SQL Editor**, ejecuta en este orden:
+   - `supabase/migrations/20260825170000_initial.sql`
+   - `supabase/migrations/20260910000000_transfers_runtime.sql`
+   - (opcional) `supabase/migrations/20260908150000_storage_policies.sql`
+3. **Project Settings → API**: copia URL, anon key y service role key.
 4. Copia `.env.example` → `.env.local` y rellena:
 
 ```bash
@@ -28,16 +34,35 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ADMIN_PASSWORD=tu-password-admin
 ```
 
-5. Importa los datos demo actuales:
+5. Si usas la CLI de Supabase, también vale `supabase db push` con esas migraciones.
+6. Siembra destinos, ajustes, reseñas y traducciones (no pisa reservas/facturas/mensajes):
 
 ```bash
-npm run seed:supabase
-# o: node --env-file=.env.local scripts/seed-supabase.mjs
+ALLOW_CMS_SEED=1 npm run seed:supabase
 ```
 
-6. En Vercel, añade las mismas variables de entorno y redespliega.
+El seed crea los buckets `uploads` (público) y `cms` (privado). No hace falta crearlos a mano.
 
-Si faltan las variables de Supabase, la app sigue funcionando con `src/data/*.json` (modo local).
+Backup JSON opcional a Storage:
+
+```bash
+ALLOW_CMS_SEED=1 ALLOW_CMS_SEED_STORAGE=1 npm run seed:supabase
+```
+
+7. En **Vercel**, añade las mismas variables y redespliega.
+
+### Qué vive en Postgres
+
+- Reservas, facturas, destinos y highlights
+- Ajustes del sitio (`site_settings`)
+- Mensajes de contacto
+- Enlaces de pago, colaboradores, feedback y redirecciones SEO
+- Reseñas + meta TripAdvisor
+- Traducciones UI y de contenido
+
+Si faltan las claves o Postgres falla, se vuelve al JSON local / Storage.
+
+El admin sigue con `ADMIN_PASSWORD` + cookie (sin Auth de Supabase).
 
 ## Panel admin
 
@@ -63,7 +88,7 @@ Desde el panel puedes:
 | Traducciones | Textos UI ES → EN / DE |
 | Ajustes | Contacto, textos hero, datos fiscales |
 
-Los cambios se guardan en `src/data/*.json` y se ven en la web al instante.
+Con Supabase, los cambios se guardan en Postgres. Sin claves, en `src/data/*.json`.
 
 ## Chat IA
 

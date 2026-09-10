@@ -1,7 +1,12 @@
 /**
- * PELIGRO EN PRODUCCIÓN: este script sube src/data/*.json a Supabase Storage
- * con upsert y PUEDE PISAR datos del panel (excursiones, shore, settings…).
- * Úsalo solo en entornos vacíos / migración inicial consciente.
+ * Semilla de un proyecto Supabase nuevo:
+ *   buckets uploads (público) + cms (privado, backup)
+ *   destinos, highlights, settings, reseñas y traducciones
+ *   extras (pagos/colaboradores/feedback/redirects) solo si la tabla está vacía
+ * No pisa reservas, facturas ni mensajes.
+ *
+ *   ALLOW_CMS_SEED=1 npm run seed:supabase
+ * Backup JSON opcional: ALLOW_CMS_SEED_STORAGE=1
  */
 import { createClient } from "@supabase/supabase-js";
 import { readFile, readdir } from "node:fs/promises";
@@ -10,9 +15,9 @@ import { fileURLToPath } from "node:url";
 
 if (process.env.ALLOW_CMS_SEED !== "1") {
   console.error(
-    "Refusado: seed del CMS desactivado por seguridad.\n" +
-      "Si realmente quieres sobrescribir Storage con src/data, ejecuta:\n" +
-      "  ALLOW_CMS_SEED=1 node --env-file=.env.local scripts/seed-supabase.mjs"
+    "Refusado: seed desactivado por seguridad.\n" +
+      "Para sembrar un proyecto vacío:\n" +
+      "  ALLOW_CMS_SEED=1 npm run seed:supabase"
   );
   process.exit(1);
 }
@@ -257,162 +262,87 @@ function tourToRow(tour) {
   };
 }
 
-async function seedTables() {
-  const [
-    bookings,
-    invoices,
-    tours,
-    transfers,
-    blog,
-    settings,
-    messages,
-    cruises,
-    itineraries,
-    adminExtras,
-    uiTranslations,
-    english,
-    german,
-  ] = await Promise.all([
-    readJson("bookings.json"),
-    readJson("invoices.json"),
-    readJson("tours.json"),
-    readJson("transfers.json"),
-    readJson("blog.json"),
-    readJson("settings.json"),
-    readJson("messages.json"),
-    readJson("cruises.json"),
-    readJson("cruiseItineraries.json"),
-    readJson("adminExtras.json"),
-    readJson("uiTranslations.json"),
-    readJson("i18n/en.json"),
-    readJson("i18n/de.json"),
-  ]);
+async function tableCount(table) {
+  const { count, error } = await supabase
+    .from(table)
+    .select("*", { count: "exact", head: true });
+  if (error) {
+    console.warn(`${table}: no se pudo contar (${error.message})`);
+    return 0;
+  }
+  return count ?? 0;
+}
 
-  await upsertRows("tours", tours.map(tourToRow));
+async function seedTables() {
+  const [transfers, settings, reviews, uiTranslations, english, german, adminExtras] =
+    await Promise.all([
+      readJson("transfers.json"),
+      readJson("settings.json"),
+      readJson("reviews.json"),
+      readJson("uiTranslations.json"),
+      readJson("i18n/en.json"),
+      readJson("i18n/de.json"),
+      readJson("adminExtras.json"),
+    ]);
+
   await upsertRows(
     "transfer_destinations",
-    transfers.destinations.map((destination) => ({
+    transfers.destinations.map((destination, index) => ({
       id: destination.id,
       name: destination.name,
       slug: destination.slug,
       price_one_way: destination.priceOneWay,
       price_return: destination.priceReturn,
+      price_extra_person: destination.priceExtraPerson ?? 10,
       duration: destination.duration,
       distance: destination.distance,
+      sort_order: index,
+      active: true,
     }))
   );
   await upsertRows("transfer_meta", [
-    { id: 1, highlights: transfers.highlights ?? [] },
+    {
+      id: 1,
+      highlights: transfers.highlights ?? [],
+      updated_at: new Date().toISOString(),
+    },
   ]);
-  await upsertRows(
-    "blog_posts",
-    blog.map((post) => ({
-      slug: post.slug,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      image: post.image,
-      date: post.date,
-      author: post.author,
-      tags: post.tags ?? [],
-    }))
-  );
   await upsertRows("site_settings", [
     { id: 1, data: settings, updated_at: new Date().toISOString() },
   ]);
 
-  await upsertRows("bookings", bookings.map(bookingToRow));
-  await upsertRows("invoices", invoices.map(invoiceToRow));
-  await upsertRows(
-    "contact_messages",
-    messages.map((message) => ({
-      id: message.id,
-      created_at: message.createdAt,
-      name: message.name,
-      email: message.email,
-      phone: message.phone ?? null,
-      message: message.message,
-    }))
-  );
-
-  await upsertRows("cruise_calendar_meta", [
+  const tripadvisor = reviews.tripadvisor ?? {};
+  await upsertRows("tripadvisor_meta", [
     {
       id: 1,
-      season: cruises.season,
-      port: cruises.port,
-      source: cruises.source,
-      updated_at: cruises.updatedAt || null,
+      url: tripadvisor.url ?? "",
+      rating: tripadvisor.rating ?? 0,
+      review_count: tripadvisor.reviewCount ?? 0,
+      location_id: tripadvisor.locationId ?? null,
+      name: tripadvisor.name ?? null,
     },
   ]);
   await upsertRows(
-    "cruise_calls",
-    cruises.calls.map((call) => ({
-      id: call.id,
-      date: call.date,
-      port: call.port,
-      company: call.company,
-      ship_code: call.shipCode ?? "",
-      ship_name: call.shipName,
-      arrival_time: call.arrivalTime ?? "",
-      departure_time: call.departureTime ?? "",
-      season: call.season ?? cruises.season ?? "",
-      published: call.published ?? true,
-      notes: call.notes ?? null,
+    "reviews",
+    (reviews.reviews ?? []).map((review) => ({
+      id: review.id,
+      author: review.author,
+      title: review.title ?? null,
+      body: review.text ?? "",
+      rating: review.rating ?? 5,
+      rating_scale: review.ratingScale ?? 5,
+      locale: review.locale ?? null,
+      review_date: review.date ?? null,
+      source: review.source ?? null,
+      featured: Boolean(review.featured),
+      tour_id: review.tourId ?? null,
     }))
   );
-
-  await upsertRows(
-    "cruise_companies",
-    itineraries.companies.map((company) => ({
-      slug: company.slug,
-      name: company.name,
-      sailing_count: company.sailingCount ?? 0,
-      ships: company.ships ?? [],
-    }))
-  );
-  await upsertRows(
-    "cruise_shore_tours",
-    itineraries.shoreTours.map((tour) => ({ id: tour.id, data: tour }))
-  );
-  await upsertRows(
-    "cruise_sailings",
-    itineraries.sailings.map((sailing) => ({
-      id: sailing.id,
-      company_slug: sailing.companySlug,
-      company_name: sailing.companyName,
-      ship_slug: sailing.shipSlug,
-      ship_name: sailing.shipName,
-      departure_date: sailing.departureDate,
-      nights: sailing.nights ?? null,
-      stops: sailing.stops ?? [],
-    }))
-  );
-  await upsertRows("cruise_itineraries_meta", [
-    {
-      id: 1,
-      updated_at: itineraries.updatedAt || null,
-      source: itineraries.source ?? "",
-    },
-  ]);
-
-  const extras = [
-    ["payment_links", adminExtras.paymentLinks ?? []],
-    ["collaborators", adminExtras.collaborators ?? []],
-    ["customer_feedback", adminExtras.feedback ?? []],
-    ["cruise_ports", adminExtras.cruisePorts ?? []],
-    ["cruise_groups", adminExtras.cruiseGroups ?? []],
-    ["seo_redirects", adminExtras.redirects ?? []],
-  ];
-  for (const [table, items] of extras) {
-    await upsertRows(
-      table,
-      items.map((item) => ({ id: item.id, data: item }))
-    );
-  }
 
   await upsertRows(
     "ui_translation_overrides",
     [
+      { locale: "es", data: uiTranslations.es ?? {} },
       { locale: "en", data: uiTranslations.en ?? {} },
       { locale: "de", data: uiTranslations.de ?? {} },
     ],
@@ -426,13 +356,44 @@ async function seedTables() {
     ],
     "locale"
   );
+
+  const extras = [
+    ["payment_links", adminExtras.paymentLinks ?? []],
+    ["collaborators", adminExtras.collaborators ?? []],
+    ["customer_feedback", adminExtras.feedback ?? []],
+    ["seo_redirects", adminExtras.redirects ?? []],
+  ];
+  for (const [table, items] of extras) {
+    const existing = await tableCount(table);
+    if (existing > 0) {
+      console.log(`${table}: ${existing} filas, no se pisan`);
+      continue;
+    }
+    await upsertRows(
+      table,
+      items.map((item) => ({ id: item.id, data: item }))
+    );
+  }
+
+  console.log("bookings / invoices / contact_messages: no se siembran");
 }
 
 async function seed() {
-  console.log("1) Subiendo CMS JSON a Storage (fuente de verdad runtime)…");
-  await uploadAllCmsJson();
-  console.log("2) Sincronizando tablas relacionales (mejor esfuerzo)…");
+  console.log("1) Creando buckets de Storage…");
+  await ensureBucket(CMS_BUCKET, {
+    public: false,
+    fileSizeLimit: 50 * 1024 * 1024,
+  });
+  await ensureBucket("uploads", {
+    public: true,
+    fileSizeLimit: 6 * 1024 * 1024,
+  });
+  console.log("2) Sembrando tablas Postgres (fuente de verdad runtime)…");
   await seedTables();
+  if (process.env.ALLOW_CMS_SEED_STORAGE === "1") {
+    console.log("3) Subiendo JSON a Storage (backup opcional)…");
+    await uploadAllCmsJson();
+  }
   console.log("Seed de Supabase completado.");
 }
 
