@@ -45,11 +45,23 @@ const COPY: Record<string, Partial<Record<Locale, DestinationCopy>>> = {
   },
 };
 
+function slugifyName(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export function getDestinationCopy(
-  dest: Pick<TransferDestination, "id" | "slug">,
+  dest: Pick<TransferDestination, "id" | "slug"> & { name?: string },
   locale: Locale
 ): DestinationCopy | null {
-  const byId = COPY[dest.id] || COPY[dest.slug];
+  const keys = [dest.id, dest.slug, dest.name ? slugifyName(dest.name) : ""]
+    .map((k) => k.trim())
+    .filter(Boolean);
+  const byId = keys.map((k) => COPY[k]).find(Boolean);
   if (!byId) return null;
   return byId[locale] || byId.es || null;
 }
