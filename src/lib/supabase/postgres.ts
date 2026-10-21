@@ -215,6 +215,30 @@ export async function dbGetTransfers(): Promise<TransfersData | null> {
   });
 }
 
+export async function dbSaveTransferHighlights(
+  highlights: string[]
+): Promise<boolean> {
+  const ok = await runDb("transfer-highlights-save", async () => {
+    const payload = {
+      id: 1,
+      highlights: highlights ?? [],
+      updated_at: new Date().toISOString(),
+    };
+    let { error } = await getSupabaseAdmin()
+      .from("transfer_meta")
+      .upsert(payload, { onConflict: "id" });
+    if (error && /updated_at/i.test(error.message)) {
+      const { updated_at: _updatedAt, ...slim } = payload;
+      ({ error } = await getSupabaseAdmin()
+        .from("transfer_meta")
+        .upsert(slim, { onConflict: "id" }));
+    }
+    if (error) throw error;
+    return true;
+  });
+  return ok === true;
+}
+
 export async function dbSaveTransfers(data: TransfersData): Promise<boolean> {
   const ok = await runDb("transfers-save", async () => {
     const sb = getSupabaseAdmin();

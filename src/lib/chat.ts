@@ -1,5 +1,4 @@
 import { getSettings, getTransfersData } from "@/lib/content";
-import { formatPrice } from "@/lib/format";
 
 export type ChatMessage = {
   role: "user" | "assistant";
@@ -20,10 +19,7 @@ async function buildKnowledge(): Promise<string> {
   ]);
 
   const transferLines = transfers.destinations
-    .map(
-      (d) =>
-        `- Aeropuerto ↔ ${d.name}: ida ${formatPrice(d.priceOneWay)}, ida y vuelta ${formatPrice(d.priceReturn)} (hasta 4 pasajeros); persona extra ${formatPrice(d.priceExtraPerson ?? 10)} (${d.duration})`
-    )
+    .map((d) => `- Aeropuerto ↔ ${d.name}${d.duration ? ` (${d.duration})` : ""}`)
     .join("\n");
 
   return `
@@ -38,7 +34,7 @@ Ventajas: ${transfers.highlights.join("; ")}
 
 INFO CLAVE:
 - Traslados 100% privados entre el Aeropuerto de Lanzarote (ACE) y hoteles/villas.
-- El precio es por vehículo (no por persona), hasta 4 pasajeros. Extra por persona adicional.
+- El precio es por vehículo (no por persona). Se confirma al reservar.
 - Se puede reservar solo ida, solo vuelta o ida y vuelta.
 - Si el vuelo se retrasa, se adapta la recogida. Indique número de vuelo al reservar.
 - Cancelación gratuita habitualmente hasta 24h antes.
@@ -53,11 +49,11 @@ function localReply(message: string, knowledge: string): string {
     /hola|buenas|hey|hello|buenos dias|buenas tardes|saludos/.test(q) &&
     q.length < 40
   ) {
-    return "¡Hola! Soy el asistente de Lanzarote Transfers. Puedo ayudarte con destinos, precios y la reserva de tu traslado privado al aeropuerto. ¿A qué zona vas?";
+    return "¡Hola! Soy el asistente de Lanzarote Transfers. Puedo ayudarte con destinos y la reserva de tu traslado privado al aeropuerto. ¿A qué zona vas?";
   }
 
   if (/gracias|thank/.test(q)) {
-    return "¡De nada! Si quieres, te indico el precio a tu zona o te ayudo a reservar en /traslados.";
+    return "¡De nada! Si quieres, te ayudo a reservar en /traslados.";
   }
 
   if (/traslad|aeropuerto|taxi|recogida|transfer|playa blanca|puerto del carmen|costa teguise|arrecife|puerto calero|hotel/.test(q)) {
@@ -77,11 +73,7 @@ function localReply(message: string, knowledge: string): string {
   }
 
   if (/precio|cuanto|cuesta|tarif|euro|€/.test(q)) {
-    const lines = knowledge
-      .split("\n")
-      .filter((l) => l.includes("Aeropuerto ↔"))
-      .join("\n");
-    return `Tarifas orientativas (por vehículo, hasta 4 pasajeros):\n\n${lines}\n\nReserva en /traslados. ¿A qué zona vas?`;
+    return "La tarifa es por vehículo y se confirma al reservar, según destino, trayecto y número de pasajeros. Puedes ver el total en el formulario de /traslados.";
   }
 
   if (/cancel|reembol|anular/.test(q)) {

@@ -179,7 +179,7 @@ export function TransferBookingForm({
             <option value="">{dict.transferForm.destinationPlaceholder}</option>
             {destinations.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.name} — {dict.common.from} {formatPrice(d.priceOneWay)}
+                {d.name}
               </option>
             ))}
           </select>

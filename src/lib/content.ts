@@ -29,6 +29,7 @@ import {
   dbGetSettings,
   dbGetTransfers,
   dbSaveSettings,
+  dbSaveTransferHighlights,
   dbSaveTransfers,
 } from "@/lib/supabase/postgres";
 import { tourMatchesSlug } from "@/i18n/tour-slugs";
@@ -349,12 +350,17 @@ export async function deleteTransfer(id: string): Promise<boolean> {
 export async function updateTransferHighlights(
   highlights: string[]
 ): Promise<string[]> {
+  const clean = highlights.map((h) => h.trim()).filter(Boolean);
+  if (await dbSaveTransferHighlights(clean)) {
+    revalidateSite();
+    return clean;
+  }
   const fromDb = await dbGetTransfers();
   const data =
     fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
-  data.highlights = highlights;
+  data.highlights = clean;
   await saveTransfersData(data);
-  return highlights;
+  return clean;
 }
 
 /* ── Cruises (port calls) ── */

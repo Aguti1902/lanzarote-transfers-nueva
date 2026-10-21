@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import type { TransferDestination } from "@/types";
+import type { Locale } from "@/i18n/config";
 import { formatPrice } from "@/lib/format";
+import { getDestinationCopy } from "@/lib/destination-copy";
 import {
   Field,
   adminInput,
@@ -26,23 +28,65 @@ const emptyDest = (): TransferDestination => ({
   description: "",
 });
 
+const localeTabs: { id: Locale; label: string }[] = [
+  { id: "es", label: "Español" },
+  { id: "en", label: "Inglés" },
+  { id: "de", label: "Alemán" },
+];
+
+type DestCopyMap = Record<string, string>;
+
 export default function AdminTrasladosPage() {
   const [destinations, setDestinations] = useState<TransferDestination[]>([]);
   const [highlights, setHighlights] = useState<string[]>([]);
+  const [highlightsEn, setHighlightsEn] = useState("");
+  const [highlightsDe, setHighlightsDe] = useState("");
+  const [destCopyEn, setDestCopyEn] = useState<DestCopyMap>({});
+  const [destCopyDe, setDestCopyDe] = useState<DestCopyMap>({});
   const [editing, setEditing] = useState<TransferDestination | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<TransferDestination>(emptyDest());
   const [highlightsText, setHighlightsText] = useState("");
+  const [copyLocale, setCopyLocale] = useState<Locale>("es");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   async function load() {
     setLoading(true);
-    const res = await fetch("/api/transfers");
+    const [res, enRes, deRes] = await Promise.all([
+      fetch("/api/transfers"),
+      fetch("/api/admin/content-translations?locale=en"),
+      fetch("/api/admin/content-translations?locale=de"),
+    ]);
     const data = await res.json();
+    const enData = enRes.ok ? await enRes.json() : {};
+    const deData = deRes.ok ? await deRes.json() : {};
     setDestinations(data.destinations || []);
     setHighlights(data.highlights || []);
     setHighlightsText(arrayToLines(data.highlights || []));
+    setHighlightsEn(arrayToLines(enData.transfers?.highlights || []));
+    setHighlightsDe(arrayToLines(deData.transfers?.highlights || []));
+    const enDest: DestCopyMap = {};
+    const deDest: DestCopyMap = {};
+    for (const [id, value] of Object.entries(
+      (enData.transfers?.destinations || {}) as Record<
+        string,
+        { description?: string }
+      >
+    )) {
+      if (value?.description) enDest[id] = value.description;
+    }
+    for (const [id, value] of Object.entries(
+      (deData.transfers?.destinations || {}) as Record<
+        string,
+        { description?: string }
+      >
+    )) {
+      if (value?.description) deDest[id] = value.description;
+    }
+    setDestCopyEn(enDest);
+    setDestCopyDe(deDest);
     setLoading(false);
   }
 
@@ -54,20 +98,25 @@ export default function AdminTrasladosPage() {
     setCreating(true);
     setEditing(null);
     setForm(emptyDest());
+    setCopyLocale("es");
   }
 
   function startEdit(d: TransferDestination) {
     setEditing(d);
     setCreating(false);
+    const copy = getDestinationCopy(d, "es");
     setForm({
       ...d,
       priceExtraPerson: d.priceExtraPerson ?? 10,
+      description: d.description || copy?.html || "",
     });
+    setCopyLocale("es");
   }
 
   async function saveDestination(e: React.FormEvent) {
     e.preventDefault();
     setMessage("");
+    setError("");
     const res = await fetch("/api/transfers", {
       method: creating ? "POST" : "PUT",
       headers: { "Content-Type": "application/json" },
@@ -75,8 +124,40 @@ export default function AdminTrasladosPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setMessage(data.error || "Error");
+      setError(data.error || "No se pudo guardar el destino");
       return;
+    }
+    const destId = data.destination?.id || form.id;
+    if (destId) {
+      const enText = destCopyEn[destId] || destCopyEn._draft || "";
+      const deText = destCopyDe[destId] || destCopyDe._draft || "";
+      const [enSave, deSave] = await Promise.all([
+        fetch("/api/admin/content-translations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            locale: "en",
+            transfers: {
+              destinations: { [destId]: { description: enText } },
+            },
+          }),
+        }),
+        fetch("/api/admin/content-translations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            locale: "de",
+            transfers: {
+              destinations: { [destId]: { description: deText } },
+            },
+          }),
+        }),
+      ]);
+      if (!enSave.ok || !deSave.ok) {
+        setError("Destino guardado en español, pero falló inglés o alemán");
+        await load();
+        return;
+      }
     }
     setCreating(false);
     setEditing(null);
@@ -94,7 +175,8 @@ export default function AdminTrasladosPage() {
 
   async function saveHighlights() {
     setMessage("");
-    const res = await fetch("/api/transfers", {
+    setError("");
+    const esRes = await fetch("/api/transfers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -102,12 +184,54 @@ export default function AdminTrasladosPage() {
         highlights: linesToArray(highlightsText),
       }),
     });
-    if (!res.ok) {
-      setMessage("Error al guardar ventajas");
+    const esData = await esRes.json().catch(() => ({}));
+    const [enRes, deRes] = await Promise.all([
+      fetch("/api/admin/content-translations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          locale: "en",
+          transfers: { highlights: linesToArray(highlightsEn) },
+        }),
+      }),
+      fetch("/api/admin/content-translations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          locale: "de",
+          transfers: { highlights: linesToArray(highlightsDe) },
+        }),
+      }),
+    ]);
+    if (!esRes.ok || !enRes.ok || !deRes.ok) {
+      setError(
+        esData.error ||
+          "No se pudieron guardar las ventajas. Revisa español, inglés y alemán."
+      );
       return;
     }
-    setMessage("Ventajas actualizadas");
+    setMessage("Ventajas actualizadas. Ya se ven en la web de traslados.");
     await load();
+  }
+
+  const destId = form.id || editing?.id || "_draft";
+  const textValue =
+    copyLocale === "en"
+      ? destCopyEn[destId] || getDestinationCopy(form, "en")?.html || ""
+      : copyLocale === "de"
+        ? destCopyDe[destId] || getDestinationCopy(form, "de")?.html || ""
+        : form.description || "";
+
+  function setTextValue(value: string) {
+    if (copyLocale === "en") {
+      setDestCopyEn((prev) => ({ ...prev, [destId]: value }));
+      return;
+    }
+    if (copyLocale === "de") {
+      setDestCopyDe((prev) => ({ ...prev, [destId]: value }));
+      return;
+    }
+    setForm({ ...form, description: value });
   }
 
   return (
@@ -116,7 +240,8 @@ export default function AdminTrasladosPage() {
         <div>
           <h1 className="font-display text-3xl text-ink">Traslados</h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Todos los destinos aeropuerto ↔ zona, precios y ventajas
+            Destinos, fotos, textos por idioma y ventajas. Los precios siguen
+            aquí para calcular la reserva, pero ya no se publican en la web.
           </p>
         </div>
         <button
@@ -129,9 +254,31 @@ export default function AdminTrasladosPage() {
         </button>
       </div>
 
+      <div className="rounded-xl bg-sky-soft/70 px-4 py-3 text-sm text-ink">
+        <p className="font-semibold">Dónde se cambian los textos EN / DE</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-ink-muted">
+          <li>
+            <b>Esta página:</b> texto de cada destino y ventajas del servicio
+            (pestañas Español / Inglés / Alemán).
+          </li>
+          <li>
+            <b>Ajustes:</b> título, introducción y cuerpo de la página de
+            traslados, con las mismas pestañas.
+          </li>
+          <li>
+            <b>Traducciones:</b> menú, botones y textos fijos de la interfaz.
+          </li>
+        </ul>
+      </div>
+
       {message && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
           {message}
+        </p>
+      )}
+      {error && (
+        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-800">
+          {error}
         </p>
       )}
 
@@ -212,17 +359,36 @@ export default function AdminTrasladosPage() {
               hint="Cada casilla de la web usa esta foto. Si la dejas vacía, se asigna una imagen distinta por destino."
             />
           </div>
-          <Field label="Texto (opcional)" className="md:col-span-2 lg:col-span-4">
-            <textarea
-              className={adminTextarea}
-              rows={3}
-              value={form.description || ""}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              placeholder="Breve descripción que se ve al abrir el destino"
-            />
-          </Field>
+          <div className="md:col-span-2 lg:col-span-4">
+            <div className="mb-2 flex flex-wrap gap-2">
+              {localeTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setCopyLocale(tab.id)}
+                  className={`rounded px-3 py-1.5 text-xs font-bold ${
+                    copyLocale === tab.id
+                      ? "bg-ocean text-white"
+                      : "bg-bg text-ink ring-1 ring-sand-line"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <Field
+              label={`Texto de la ficha (${copyLocale.toUpperCase()})`}
+              className="md:col-span-2 lg:col-span-4"
+            >
+              <textarea
+                className={adminTextarea}
+                rows={10}
+                value={textValue}
+                onChange={(e) => setTextValue(e.target.value)}
+                placeholder="Texto que se ve al abrir el destino"
+              />
+            </Field>
+          </div>
           <div className="flex gap-3 md:col-span-2 lg:col-span-4">
             <button
               type="submit"
@@ -317,15 +483,42 @@ export default function AdminTrasladosPage() {
       <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
         <h2 className="font-display text-xl">Ventajas del servicio</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Se muestran en la página pública de traslados (una por línea)
+          Aparecen en la página pública de traslados, debajo de los destinos.
+          Una ventaja por línea.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {localeTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setCopyLocale(tab.id)}
+              className={`rounded px-3 py-1.5 text-xs font-bold ${
+                copyLocale === tab.id
+                  ? "bg-ocean text-white"
+                  : "bg-bg text-ink ring-1 ring-sand-line"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         <textarea
           className={`${adminTextarea} mt-4`}
-          value={highlightsText}
-          onChange={(e) => setHighlightsText(e.target.value)}
+          value={
+            copyLocale === "en"
+              ? highlightsEn
+              : copyLocale === "de"
+                ? highlightsDe
+                : highlightsText
+          }
+          onChange={(e) => {
+            if (copyLocale === "en") setHighlightsEn(e.target.value);
+            else if (copyLocale === "de") setHighlightsDe(e.target.value);
+            else setHighlightsText(e.target.value);
+          }}
         />
         <p className="mt-2 text-xs text-ink-muted">
-          Actual: {highlights.length} puntos
+          Español: {highlights.length} puntos
         </p>
         <button
           type="button"

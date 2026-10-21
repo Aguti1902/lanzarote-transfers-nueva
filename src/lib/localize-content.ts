@@ -75,7 +75,9 @@ interface ContentTranslations {
   settings: Partial<SiteSettings>;
   tours: Record<string, TourTranslation>;
   blog: Record<string, Record<string, unknown>>;
-  transfers: Pick<TransfersData, "highlights">;
+  transfers: Pick<TransfersData, "highlights"> & {
+    destinations?: Record<string, { description?: string }>;
+  };
   shoreTours: Record<string, ShoreTourTranslation>;
   cruise: {
     seaDayLabel: string;
@@ -169,6 +171,37 @@ export async function patchSettingsTranslations(
     const value = data.settings[key];
     if (typeof value === "string" && !value.trim()) {
       delete data.settings[key];
+    }
+  }
+  await saveContentTranslations(locale, data);
+  return data;
+}
+
+export async function patchTransfersTranslations(
+  locale: TranslatedLocale,
+  patch: {
+    highlights?: string[];
+    destinations?: Record<string, { description?: string }>;
+  }
+): Promise<ContentTranslations> {
+  const data = await loadTranslations(locale, { fresh: true });
+  data.transfers = {
+    highlights: data.transfers?.highlights || [],
+    destinations: { ...(data.transfers?.destinations || {}) },
+  };
+  if (patch.highlights) {
+    data.transfers.highlights = patch.highlights
+      .map((h) => h.trim())
+      .filter(Boolean);
+  }
+  if (patch.destinations) {
+    for (const [id, value] of Object.entries(patch.destinations)) {
+      const description = value.description?.trim() || "";
+      if (!description) {
+        delete data.transfers.destinations![id];
+        continue;
+      }
+      data.transfers.destinations![id] = { description };
     }
   }
   await saveContentTranslations(locale, data);
@@ -416,9 +449,13 @@ export async function localizeTransfers(
     }
   }
 
+  const destCopy = translations.transfers?.destinations || {};
   return {
     ...data,
-    ...(translations.transfers || {}),
+    destinations: data.destinations.map((dest) => {
+      const description = destCopy[dest.id]?.description?.trim();
+      return description ? { ...dest, description } : dest;
+    }),
     ...(highlights?.length ? { highlights } : {}),
   };
 }

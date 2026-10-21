@@ -11,7 +11,9 @@ import { requireAdmin } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   const data = await getTransfersData();
   return NextResponse.json(data);
 }
@@ -31,8 +33,10 @@ export async function POST(request: Request) {
     }
     const destination = await createTransfer(body);
     return NextResponse.json({ destination }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "No se pudo crear" }, { status: 500 });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudo crear";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -47,8 +51,10 @@ export async function PUT(request: Request) {
     }
     const destination = await upsertTransfer(body);
     return NextResponse.json({ destination });
-  } catch {
-    return NextResponse.json({ error: "No se pudo guardar" }, { status: 500 });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "No se pudo guardar";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

@@ -6,7 +6,6 @@ import { PageHero } from "@/components/PageHero";
 import { TransferBookingForm } from "@/components/TransferBookingForm";
 import { TransferRouteChips } from "@/components/TransferRouteChips";
 import { DestinationGrid } from "@/components/DestinationGrid";
-import { formatPrice } from "@/lib/format";
 import type { TransferDirection } from "@/lib/transfer-price";
 import type { Dictionary } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/config";
@@ -69,77 +68,27 @@ export function TransfersPageView({
               dict={dict}
             />
 
-            <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-              {transfers.highlights.map((h) => (
-                <li
-                  key={h}
-                  className="flex items-start gap-2 rounded-lg bg-white px-4 py-3 text-sm ring-1 ring-sand-line"
-                >
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ocean" />
-                  {h}
-                </li>
-              ))}
-            </ul>
-
-            <div
-              id="precios"
-              className="mt-12 overflow-hidden rounded-lg bg-white ring-1 ring-sand-line"
-            >
-              <div className="border-b border-sand-line bg-sky-soft px-4 py-3">
-                <h2 className="text-xl font-bold text-ink">
-                  {dict.transfers.tableTitle}
-                </h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[560px] text-left text-sm">
-                  <thead className="border-b border-sand-line text-ink-muted">
-                    <tr>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.destination}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.duration}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.oneWay}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.return}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.extraPerson}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transfers.destinations.map((d) => (
-                      <tr
-                        key={d.id}
-                        className="border-b border-sand-line last:border-0"
-                      >
-                        <td className="px-4 py-3.5 font-semibold text-ink">
-                          {d.name}
-                        </td>
-                        <td className="px-4 py-3.5 text-ink-muted">
-                          {d.duration}
-                        </td>
-                        <td className="px-4 py-3.5 font-medium text-ocean-deep">
-                          {formatPrice(d.priceOneWay)}
-                        </td>
-                        <td className="px-4 py-3.5 font-medium text-ocean-deep">
-                          {formatPrice(d.priceReturn)}
-                        </td>
-                        <td className="px-4 py-3.5 font-medium text-ocean-deep">
-                          {formatPrice(d.priceExtraPerson ?? 10)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="border-t border-sand-line px-4 py-3 text-xs text-ink-muted">
-                {dict.transfers.priceIncludes.replace("{n}", "4")}.
-              </p>
+            <div className="mt-10">
+              <h2 className="text-xl font-bold text-ink">
+                {dict.transfers.advantagesTitle}
+              </h2>
+              {transfers.highlights.length > 0 ? (
+                <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {transfers.highlights.map((h) => (
+                    <li
+                      key={h}
+                      className="flex items-start gap-2 rounded-lg bg-white px-4 py-3 text-sm ring-1 ring-sand-line"
+                    >
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ocean" />
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm text-ink-muted">
+                  {dict.transfers.advantagesEmpty}
+                </p>
+              )}
             </div>
           </div>
 

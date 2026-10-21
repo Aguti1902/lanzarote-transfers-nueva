@@ -19,7 +19,6 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { resolveLocale } from "@/i18n/get-locale";
 import { localePath } from "@/i18n/path";
 import { RichContent } from "@/components/RichContent";
-import { formatPrice } from "@/lib/format";
 import { destinationCover } from "@/lib/destination-images";
 
 const ReviewsSection = dynamic(() =>
@@ -206,11 +205,9 @@ export default async function HomePage({ params }: Props) {
                   {destination.name}
                 </h3>
                 <p className="mt-2 text-sm text-ink-muted">
-                  {destination.duration} · {destination.distance}
-                </p>
-                <p className="mt-5 text-sm text-ink-muted">{dict.common.from}</p>
-                <p className="text-2xl font-bold text-ocean">
-                  {formatPrice(destination.priceOneWay)}
+                  {[destination.duration, destination.distance]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
             </Link>

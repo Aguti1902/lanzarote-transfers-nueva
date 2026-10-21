@@ -4,7 +4,6 @@ import type { TransferDestination } from "@/types";
 import type { Dictionary } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/path";
-import { formatPrice } from "@/lib/format";
 import { destinationCover } from "@/lib/destination-images";
 
 export function DestinationGrid({
@@ -64,10 +63,7 @@ export function DestinationGrid({
                 <p className="mt-1 text-sm text-ink-muted">
                   {[dest.duration, dest.distance].filter(Boolean).join(" · ")}
                 </p>
-                <p className="mt-3 text-lg font-bold text-ocean">
-                  {dict.common.from} {formatPrice(dest.priceOneWay)}
-                </p>
-                <p className="mt-2 text-sm font-semibold text-ocean">
+                <p className="mt-3 text-sm font-semibold text-ocean">
                   {dict.transfers.viewDestination} →
                 </p>
               </div>

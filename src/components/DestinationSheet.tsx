@@ -6,9 +6,11 @@ import { X } from "lucide-react";
 import { TransferBookingForm } from "@/components/TransferBookingForm";
 import { RichContent } from "@/components/RichContent";
 import { useLocale } from "@/components/LocaleProvider";
-import { formatPrice } from "@/lib/format";
 import { destinationCover } from "@/lib/destination-images";
-import { getDestinationCopy } from "@/lib/destination-copy";
+import {
+  destinationBodyHtml,
+  getDestinationCopy,
+} from "@/lib/destination-copy";
 import type { TransferDestination } from "@/types";
 
 export function DestinationSheet({
@@ -21,6 +23,7 @@ export function DestinationSheet({
   const router = useRouter();
   const { dict, href, locale } = useLocale();
   const copy = getDestinationCopy(destination, locale);
+  const bodyHtml = destinationBodyHtml(destination, locale);
 
   function close() {
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -78,40 +81,16 @@ export function DestinationSheet({
                   .join(" · ")}
               </p>
             )}
-            {copy?.html ? (
+            {bodyHtml ? (
               <RichContent
-                text={copy.html}
+                text={bodyHtml}
                 className="mt-5 !space-y-3 text-base [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-ink [&_li]:my-1"
               />
-            ) : destination.description ? (
-              <p className="mt-4 text-base leading-relaxed text-ink-muted">
-                {destination.description}
-              </p>
             ) : (
               <p className="mt-4 text-base leading-relaxed text-ink-muted">
                 {dict.transfers.bookThis}: ACE ↔ {destination.name}.
               </p>
             )}
-            <dl className="mt-6 grid grid-cols-3 gap-3 text-sm">
-              <div className="rounded-lg bg-sky-soft px-3 py-3">
-                <dt className="text-ink-muted">{dict.transfers.oneWay}</dt>
-                <dd className="mt-1 font-bold text-ocean">
-                  {formatPrice(destination.priceOneWay)}
-                </dd>
-              </div>
-              <div className="rounded-lg bg-sky-soft px-3 py-3">
-                <dt className="text-ink-muted">{dict.transfers.return}</dt>
-                <dd className="mt-1 font-bold text-ocean">
-                  {formatPrice(destination.priceReturn)}
-                </dd>
-              </div>
-              <div className="rounded-lg bg-sky-soft px-3 py-3">
-                <dt className="text-ink-muted">{dict.transfers.extraPerson}</dt>
-                <dd className="mt-1 font-bold text-ocean">
-                  {formatPrice(destination.priceExtraPerson ?? 10)}
-                </dd>
-              </div>
-            </dl>
           </div>
           <div className="md:sticky md:top-4 md:self-start">
             <TransferBookingForm

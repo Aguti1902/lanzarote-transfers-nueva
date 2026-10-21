@@ -101,6 +101,8 @@ export type Dictionary = {
     destinationsKicker: string;
     viewDestination: string;
     bookThis: string;
+    advantagesTitle: string;
+    advantagesEmpty: string;
     faqTitle: string;
     faqs: { q: string; a: string }[];
   };
@@ -605,6 +607,8 @@ const es: Dictionary = {
     destinationsKicker: "Elige tu zona",
     viewDestination: "Ver destino",
     bookThis: "Reservar este traslado",
+    advantagesTitle: "Ventajas del servicio",
+    advantagesEmpty: "Las ventajas del servicio se editan en el panel de Traslados.",
     faqTitle: "Preguntas frecuentes sobre nuestros traslados en Lanzarote",
     faqs: [
       {
@@ -1177,6 +1181,8 @@ const en: Dictionary = {
     destinationsKicker: "Choose your area",
     viewDestination: "View destination",
     bookThis: "Book this transfer",
+    advantagesTitle: "Why book with us",
+    advantagesEmpty: "Service highlights are edited in the Transfers admin panel.",
     faqTitle: "Frequently asked questions about our transfers",
     faqs: [
       {
@@ -1728,6 +1734,8 @@ const de: Dictionary = {
     destinationsKicker: "Wählen Sie Ihre Zone",
     viewDestination: "Ziel ansehen",
     bookThis: "Diesen Transfer buchen",
+    advantagesTitle: "Ihre Vorteile",
+    advantagesEmpty: "Die Servicevorteile werden im Transfer-Admin bearbeitet.",
     faqTitle: "Häufige Fragen zu unseren Transfers",
     faqs: [
       {
