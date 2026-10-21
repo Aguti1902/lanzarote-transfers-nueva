@@ -68,28 +68,28 @@ export function TransfersPageView({
               dict={dict}
             />
 
-            <div className="mt-10">
-              <h2 className="text-xl font-bold text-ink">
-                {dict.transfers.advantagesTitle}
-              </h2>
-              {transfers.highlights.length > 0 ? (
+            {transfers.highlights.some(
+              (h) => h.trim() && !h.startsWith("@@dest-media@@")
+            ) && (
+              <div className="mt-10">
+                <h2 className="text-xl font-bold text-ink">
+                  {dict.transfers.advantagesTitle}
+                </h2>
                 <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {transfers.highlights.map((h) => (
-                    <li
-                      key={h}
-                      className="flex items-start gap-2 rounded-lg bg-white px-4 py-3 text-sm ring-1 ring-sand-line"
-                    >
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ocean" />
-                      {h}
-                    </li>
-                  ))}
+                  {transfers.highlights
+                    .filter((h) => h.trim() && !h.startsWith("@@dest-media@@"))
+                    .map((h) => (
+                      <li
+                        key={h}
+                        className="flex items-start gap-2 rounded-lg bg-white px-4 py-3 text-sm ring-1 ring-sand-line"
+                      >
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ocean" />
+                        {h}
+                      </li>
+                    ))}
                 </ul>
-              ) : (
-                <p className="mt-3 text-sm text-ink-muted">
-                  {dict.transfers.advantagesEmpty}
-                </p>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">

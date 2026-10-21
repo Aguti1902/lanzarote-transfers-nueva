@@ -12,7 +12,7 @@ import {
   readLocalCmsJson,
   writeCmsJson,
 } from "@/lib/supabase/cms-store";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { isSupabaseConfigured, warnSupabaseFallback } from "@/lib/supabase/client";
 import {
   dbGetContentTranslations,
   dbSaveContentTranslations,
@@ -117,9 +117,15 @@ function loadTranslations(
   const reader = fresh ? readCmsJsonFresh : readCmsJson;
   const pending = (async () => {
     const fromDb = await dbGetContentTranslations(locale);
-    const data =
-      (fromDb as ContentTranslations | null) ??
-      (await reader<ContentTranslations>(`i18n/${locale}.json`));
+    let data = fromDb as ContentTranslations | null;
+    if (!data) {
+      try {
+        data = await reader<ContentTranslations>(`i18n/${locale}.json`);
+      } catch (error) {
+        warnSupabaseFallback(`i18n-read:${locale}`, error as Error);
+        data = await readLocalCmsJson<ContentTranslations>(`i18n/${locale}.json`);
+      }
+    }
     return {
       ...emptyContentTranslations(),
       ...data,

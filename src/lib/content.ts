@@ -289,9 +289,11 @@ export async function getTransferDestinations(): Promise<TransferDestination[]> 
 }
 
 export async function saveTransfersData(data: TransfersData): Promise<void> {
-  if (!(await dbSaveTransfers(data))) {
-    await writeJson("transfers.json", data);
+  if (await dbSaveTransfers(data)) {
+    revalidateSite();
+    return;
   }
+  await writeJson("transfers.json", data);
   revalidateSite();
 }
 

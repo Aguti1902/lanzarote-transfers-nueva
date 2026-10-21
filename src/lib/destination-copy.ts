@@ -117,22 +117,24 @@ export function getDestinationCopy(
   return byId[locale] || byId.es || null;
 }
 
+/** Quita líneas de tarifa para no publicar precios en la ficha. */
+function hideTariffLines(text: string): string {
+  return text
+    .replace(/<li>[\s\S]*?\d[\d\s.,]*\s*€[\s\S]*?<\/li>/gi, "")
+    .replace(/<p>[\s\S]*?(?:precio|price|preis)[\s\S]*?\d[\s\S]*?€[\s\S]*?<\/p>/gi, "")
+    .replace(/^(?:[-*]\s*)?(?:precio|price|preis)\s*:.*€.*$/gim, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export function destinationBodyHtml(
   dest: TransferDestination,
   locale: Locale
 ): string {
   const copy = getDestinationCopy(dest, locale);
   const custom = dest.description?.trim() || "";
-  if (copy) {
-    if (
-      custom.includes("<h2>") &&
-      !/\d+\s*€|from\s+\d+|ab\s+\d+\s*€/i.test(custom)
-    ) {
-      return custom;
-    }
-    return copy.html;
-  }
-  return custom;
+  const source = custom || copy?.html || "";
+  return hideTariffLines(source);
 }
 
 export function destinationInternalPath(

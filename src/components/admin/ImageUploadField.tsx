@@ -155,7 +155,11 @@ export function ImageUploadField({
                 className="object-cover"
                 style={{ objectPosition: formatObjectPosition(pos.x, pos.y) }}
                 sizes={previewMode === "mobile" ? "160px" : "400px"}
-                unoptimized={value.startsWith("data:") || value.startsWith("blob:")}
+                unoptimized={
+                  value.startsWith("data:") ||
+                  value.startsWith("blob:") ||
+                  value.includes("supabase.co")
+                }
               />
             </div>
           </div>

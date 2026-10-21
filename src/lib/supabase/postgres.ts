@@ -165,6 +165,73 @@ export async function dbSaveInvoices(invoices: Invoice[]): Promise<boolean> {
 
 /* ── Transfers ── */
 
+/** Respaldo de foto y texto si la tabla aún no tiene esas columnas. */
+const DEST_MEDIA_MARK = "@@dest-media@@";
+
+type DestMedia = Record<string, { image?: string; description?: string }>;
+
+function splitHighlights(raw: unknown): { highlights: string[]; media: DestMedia } {
+  const list = Array.isArray(raw) ? raw.map((item) => String(item)) : [];
+  const mark = list.find((item) => item.startsWith(DEST_MEDIA_MARK));
+  const highlights = list.filter((item) => !item.startsWith(DEST_MEDIA_MARK));
+  let media: DestMedia = {};
+  if (mark) {
+    try {
+      const parsed = JSON.parse(mark.slice(DEST_MEDIA_MARK.length)) as DestMedia;
+      if (parsed && typeof parsed === "object") media = parsed;
+    } catch {
+      media = {};
+    }
+  }
+  return { highlights, media };
+}
+
+function packHighlights(highlights: string[], media: DestMedia): string[] {
+  const clean = (highlights || [])
+    .map((item) => item.trim())
+    .filter((item) => item && !item.startsWith(DEST_MEDIA_MARK));
+  const useful: DestMedia = {};
+  for (const [id, value] of Object.entries(media || {})) {
+    const image = value?.image?.trim() || "";
+    const description = value?.description?.trim() || "";
+    if (image || description) useful[id] = { image, description };
+  }
+  if (Object.keys(useful).length) {
+    clean.push(DEST_MEDIA_MARK + JSON.stringify(useful));
+  }
+  return clean;
+}
+
+function mediaFromDestinations(destinations: TransferDestination[]): DestMedia {
+  const media: DestMedia = {};
+  for (const dest of destinations) {
+    const image = dest.image?.trim() || "";
+    const description = dest.description?.trim() || "";
+    if (image || description) {
+      media[dest.id] = { image, description };
+    }
+  }
+  return media;
+}
+
+async function upsertTransferMeta(highlights: string[]): Promise<void> {
+  const payload = {
+    id: 1,
+    highlights,
+    updated_at: new Date().toISOString(),
+  };
+  let { error } = await getSupabaseAdmin()
+    .from("transfer_meta")
+    .upsert(payload, { onConflict: "id" });
+  if (error && /updated_at/i.test(error.message)) {
+    const { updated_at: _updatedAt, ...slim } = payload;
+    ({ error } = await getSupabaseAdmin()
+      .from("transfer_meta")
+      .upsert(slim, { onConflict: "id" }));
+  }
+  if (error) throw error;
+}
+
 function destToRow(dest: TransferDestination, index: number) {
   return {
     id: dest.id,
@@ -208,9 +275,19 @@ export async function dbGetTransfers(): Promise<TransfersData | null> {
     if (destError) throw destError;
     if (metaError) throw metaError;
     if (!dests?.length) return null;
+    const { highlights, media } = splitHighlights(meta?.highlights);
     return {
-      destinations: dests.map((row) => rowToDest(row as Record<string, unknown>)),
-      highlights: (meta?.highlights as string[]) || [],
+      destinations: dests.map((row) => {
+        const dest = rowToDest(row as Record<string, unknown>);
+        const extra = media[dest.id];
+        if (!extra) return dest;
+        return {
+          ...dest,
+          image: dest.image?.trim() || extra.image || "",
+          description: dest.description?.trim() || extra.description || "",
+        };
+      }),
+      highlights,
     };
   });
 }
@@ -219,28 +296,23 @@ export async function dbSaveTransferHighlights(
   highlights: string[]
 ): Promise<boolean> {
   const ok = await runDb("transfer-highlights-save", async () => {
-    const payload = {
-      id: 1,
-      highlights: highlights ?? [],
-      updated_at: new Date().toISOString(),
-    };
-    let { error } = await getSupabaseAdmin()
+    const { data: meta, error: readError } = await getSupabaseAdmin()
       .from("transfer_meta")
-      .upsert(payload, { onConflict: "id" });
-    if (error && /updated_at/i.test(error.message)) {
-      const { updated_at: _updatedAt, ...slim } = payload;
-      ({ error } = await getSupabaseAdmin()
-        .from("transfer_meta")
-        .upsert(slim, { onConflict: "id" }));
-    }
-    if (error) throw error;
+      .select("highlights")
+      .eq("id", 1)
+      .maybeSingle();
+    if (readError) throw readError;
+    const { media } = splitHighlights(meta?.highlights);
+    await upsertTransferMeta(packHighlights(highlights, media));
     return true;
   });
   return ok === true;
 }
 
 export async function dbSaveTransfers(data: TransfersData): Promise<boolean> {
-  const ok = await runDb("transfers-save", async () => {
+  if (!useDb()) return false;
+  try {
+    return await (async () => {
     const sb = getSupabaseAdmin();
     const { data: existing, error: readError } = await sb
       .from("transfer_destinations")
@@ -261,31 +333,59 @@ export async function dbSaveTransfers(data: TransfersData): Promise<boolean> {
       const rows = data.destinations.map((dest, index) =>
         destToRow(dest, index)
       );
+      let pending: Record<string, unknown>[] = rows;
       let { error } = await sb
         .from("transfer_destinations")
-        .upsert(rows, { onConflict: "id" });
-      if (error && /image|description/i.test(error.message)) {
-        const slim = rows.map(
-          ({ image: _image, description: _description, ...rest }) => rest
+        .upsert(pending, { onConflict: "id" });
+      const optional = [
+        "image",
+        "description",
+        "sort_order",
+        "active",
+        "price_extra_person",
+      ];
+      const dropped = new Set<string>();
+      while (error && dropped.size < optional.length) {
+        const message = error.message || "";
+        const missing = optional.find(
+          (column) => !dropped.has(column) && new RegExp(column, "i").test(message)
         );
+        if (!missing) throw error;
+        dropped.add(missing);
+        pending = pending.map((row) => {
+          const next = { ...row };
+          delete next[missing];
+          return next;
+        });
         ({ error } = await sb
           .from("transfer_destinations")
-          .upsert(slim, { onConflict: "id" }));
+          .upsert(pending, { onConflict: "id" }));
       }
       if (error) throw error;
     }
-    const { error: metaError } = await sb.from("transfer_meta").upsert(
-      {
-        id: 1,
-        highlights: data.highlights ?? [],
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "id" }
-    );
-    if (metaError) throw metaError;
+    const { data: meta, error: metaReadError } = await sb
+      .from("transfer_meta")
+      .select("highlights")
+      .eq("id", 1)
+      .maybeSingle();
+    if (metaReadError) throw metaReadError;
+    const previous = splitHighlights(meta?.highlights).media;
+    const media = {
+      ...previous,
+      ...mediaFromDestinations(data.destinations),
+    };
+    for (const dest of data.destinations) {
+      if (!dest.image?.trim() && !dest.description?.trim()) delete media[dest.id];
+    }
+    await upsertTransferMeta(packHighlights(data.highlights ?? [], media));
     return true;
-  });
-  return ok === true;
+    })();
+  } catch (error) {
+    warnSupabaseFallback("transfers-save", error as Error);
+    const message =
+      error instanceof Error ? error.message : "No se pudo guardar el destino";
+    throw new Error(message);
+  }
 }
 
 /* ── Settings ── */

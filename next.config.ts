@@ -65,6 +65,10 @@ const nextConfig: NextConfig = {
       ...supabaseImageHosts(),
       {
         protocol: "https",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
         hostname: "www.lanzaroteexperiencetours.com",
       },
     ],
