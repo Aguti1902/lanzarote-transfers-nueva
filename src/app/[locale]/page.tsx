@@ -20,6 +20,7 @@ import { resolveLocale } from "@/i18n/get-locale";
 import { localePath } from "@/i18n/path";
 import { RichContent } from "@/components/RichContent";
 import { formatPrice } from "@/lib/format";
+import { destinationCover } from "@/lib/destination-images";
 
 const ReviewsSection = dynamic(() =>
   import("@/components/ReviewsSection").then((m) => m.ReviewsSection)
@@ -29,7 +30,7 @@ const HomeIslandVideo = dynamic(() =>
 );
 
 /** ISR: HTML/RSC cacheados; CMS se refresca ~cada 60s o al guardar. */
-export const revalidate = 300;
+export const revalidate = 60;
 
 const awards = [
   { src: "/images/awards/turismo-seguro.jpg", alt: "Turismo Seguro frente al COVID-19" },
@@ -185,22 +186,33 @@ export default async function HomePage({ params }: Props) {
           {featuredDestinations.map((destination) => (
             <Link
               key={destination.id}
-              href={lp("/traslados")}
-              className="card-lift rounded-2xl bg-white p-6 ring-1 ring-sand-line"
+              href={lp(`/traslados-aeropuerto-lanzarote/${destination.slug}`)}
+              className="card-lift overflow-hidden rounded-2xl bg-white ring-1 ring-sand-line"
             >
-              <p className="text-xs font-bold tracking-[0.16em] text-ocean uppercase">
-                ACE → {destination.name}
-              </p>
-              <h3 className="mt-3 font-display text-2xl text-ink">
-                {destination.name}
-              </h3>
-              <p className="mt-2 text-sm text-ink-muted">
-                {destination.duration} · {destination.distance}
-              </p>
-              <p className="mt-5 text-sm text-ink-muted">{dict.common.from}</p>
-              <p className="text-2xl font-bold text-ocean">
-                {formatPrice(destination.priceOneWay)}
-              </p>
+              <div className="relative aspect-[16/10]">
+                <Image
+                  src={destinationCover(destination)}
+                  alt={destination.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:768px) 100vw, 33vw"
+                />
+              </div>
+              <div className="p-6">
+                <p className="text-xs font-bold tracking-[0.16em] text-ocean uppercase">
+                  ACE → {destination.name}
+                </p>
+                <h3 className="mt-3 font-display text-2xl text-ink">
+                  {destination.name}
+                </h3>
+                <p className="mt-2 text-sm text-ink-muted">
+                  {destination.duration} · {destination.distance}
+                </p>
+                <p className="mt-5 text-sm text-ink-muted">{dict.common.from}</p>
+                <p className="text-2xl font-bold text-ocean">
+                  {formatPrice(destination.priceOneWay)}
+                </p>
+              </div>
             </Link>
           ))}
         </div>

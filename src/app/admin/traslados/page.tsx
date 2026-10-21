@@ -11,6 +11,7 @@ import {
   arrayToLines,
   linesToArray,
 } from "@/components/admin/Field";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 const emptyDest = (): TransferDestination => ({
   id: "",
@@ -21,6 +22,8 @@ const emptyDest = (): TransferDestination => ({
   priceExtraPerson: 10,
   duration: "30 min",
   distance: "",
+  image: "",
+  description: "",
 });
 
 export default function AdminTrasladosPage() {
@@ -197,6 +200,27 @@ export default function AdminTrasladosPage() {
               value={form.distance}
               onChange={(e) => setForm({ ...form, distance: e.target.value })}
               placeholder="≈ 35 km"
+            />
+          </Field>
+          <div className="md:col-span-2 lg:col-span-4">
+            <ImageUploadField
+              label="Foto del destino"
+              folder="transfers"
+              value={form.image || ""}
+              onChange={(url) => setForm({ ...form, image: url })}
+              aspectRatio={16 / 10}
+              hint="Cada casilla de la web usa esta foto. Si la dejas vacía, se asigna una imagen distinta por destino."
+            />
+          </div>
+          <Field label="Texto (opcional)" className="md:col-span-2 lg:col-span-4">
+            <textarea
+              className={adminTextarea}
+              rows={3}
+              value={form.description || ""}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              placeholder="Breve descripción que se ve al abrir el destino"
             />
           </Field>
           <div className="flex gap-3 md:col-span-2 lg:col-span-4">

@@ -97,6 +97,10 @@ export type Dictionary = {
     return: string;
     extraPerson: string;
     priceIncludes: string;
+    destinationsTitle: string;
+    destinationsKicker: string;
+    viewDestination: string;
+    bookThis: string;
     faqTitle: string;
     faqs: { q: string; a: string }[];
   };
@@ -351,6 +355,7 @@ export type Dictionary = {
     title: string;
     subtitle: string;
     destination: string;
+    destinationPlaceholder: string;
     route: string;
     passengers: string;
     flight: string;
@@ -596,6 +601,10 @@ const es: Dictionary = {
     return: "Ida y vuelta",
     extraPerson: "Persona extra",
     priceIncludes: "Precio hasta {n} pasajeros",
+    destinationsTitle: "Destinos en Lanzarote",
+    destinationsKicker: "Elige tu zona",
+    viewDestination: "Ver destino",
+    bookThis: "Reservar este traslado",
     faqTitle: "Preguntas frecuentes sobre nuestros traslados en Lanzarote",
     faqs: [
       {
@@ -939,6 +948,7 @@ const es: Dictionary = {
     title: "Reservar traslado",
     subtitle: "Privado · recibimiento con cartel con su nombre",
     destination: "Destino *",
+    destinationPlaceholder: "Seleccione un destino",
     route: "Trayecto *",
     passengers: "Pasajeros",
     flight: "Nº de vuelo",
@@ -1163,6 +1173,10 @@ const en: Dictionary = {
     return: "Return",
     extraPerson: "Extra person",
     priceIncludes: "Price up to {n} passengers",
+    destinationsTitle: "Destinations in Lanzarote",
+    destinationsKicker: "Choose your area",
+    viewDestination: "View destination",
+    bookThis: "Book this transfer",
     faqTitle: "Frequently asked questions about our transfers",
     faqs: [
       {
@@ -1485,6 +1499,7 @@ const en: Dictionary = {
     title: "Book a transfer",
     subtitle: "Private · meet & greet with your name sign",
     destination: "Destination *",
+    destinationPlaceholder: "Select a destination",
     route: "Route *",
     passengers: "Passengers",
     flight: "Flight number",
@@ -1709,6 +1724,10 @@ const de: Dictionary = {
     return: "Hin und zurück",
     extraPerson: "Zusätzliche Person",
     priceIncludes: "Preis bis {n} Passagiere",
+    destinationsTitle: "Ziele auf Lanzarote",
+    destinationsKicker: "Wählen Sie Ihre Zone",
+    viewDestination: "Ziel ansehen",
+    bookThis: "Diesen Transfer buchen",
     faqTitle: "Häufige Fragen zu unseren Transfers",
     faqs: [
       {
@@ -2040,6 +2059,7 @@ const de: Dictionary = {
     title: "Transfer buchen",
     subtitle: "Privat · Empfang mit Namensschild",
     destination: "Ziel *",
+    destinationPlaceholder: "Ziel wählen",
     route: "Strecke *",
     passengers: "Passagiere",
     flight: "Flugnummer",

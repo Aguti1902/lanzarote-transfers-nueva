@@ -18,10 +18,36 @@ function normalizeSiteId(value: string | undefined): HubSiteId {
   return DEFAULT_HUB_SITE_ID;
 }
 
+export function getHubUrl(): string {
+  const dedicated = process.env.HUB_SUPABASE_URL?.trim() || "";
+  if (dedicated) return dedicated;
+  if (getHubSiteId() === "experience") {
+    return process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
+  }
+  return "";
+}
+
+export function getHubServiceKey(): string {
+  const dedicated = process.env.HUB_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  if (dedicated) return dedicated;
+  if (getHubSiteId() === "experience") {
+    return process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  }
+  return "";
+}
+
 export function isHubConfigured(): boolean {
-  return Boolean(
-    process.env.HUB_SUPABASE_URL && process.env.HUB_SUPABASE_SERVICE_ROLE_KEY
-  );
+  return Boolean(getHubUrl() && getHubServiceKey());
+}
+
+export function getHubHost(): string {
+  const url = getHubUrl();
+  if (!url) return "";
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return "";
+  }
 }
 
 export function getHubSiteId(): HubSiteId {

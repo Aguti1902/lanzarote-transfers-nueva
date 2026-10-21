@@ -164,8 +164,8 @@ export function remapExcursionPath(internalPath: string, locale: Locale): string
 
 const SECTION_BY_LOCALE: Record<Locale, string> = {
   es: "/traslados-aeropuerto-lanzarote",
-  en: "/airport-transfers",
-  de: "/flughafen-transfer",
+  en: "/lanzarote-airport-transfer",
+  de: "/lanzarote-flughafen-transfer",
 };
 
 /**

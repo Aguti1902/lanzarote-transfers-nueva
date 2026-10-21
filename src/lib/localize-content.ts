@@ -27,6 +27,7 @@ import {
 } from "@/lib/settings-i18n";
 import { tourSlugForLocale } from "@/i18n/tour-slugs";
 import { SHORE_TOUR_I18N_ALIASES } from "@/lib/cruise-shore-match";
+import { revalidateSite } from "@/lib/revalidate-site";
 
 export {
   mergeSettingsOverlay,
@@ -149,6 +150,7 @@ export async function saveContentTranslations(
     await writeCmsJson(`i18n/${locale}.json`, data);
   }
   clearContentTranslationCache();
+  revalidateSite();
 }
 
 /** Merge/replace settings text overlay for EN or DE without touching tours/blog/etc. */

@@ -3,8 +3,8 @@ import type { Locale } from "../i18n/config";
 
 const TRANSFER_BY_LOCALE: Record<Locale, string> = {
   es: "/es/traslados-aeropuerto-lanzarote",
-  en: "/en/airport-transfers",
-  de: "/de/flughafen-transfer",
+  en: "/en/lanzarote-airport-transfer",
+  de: "/de/lanzarote-flughafen-transfer",
 };
 
 const RETIRED_SECTION_RE =
@@ -51,6 +51,7 @@ export const LEGACY_PATH_REDIRECTS: Record<string, string> = {
   "/en/excursiones": TRANSFER_BY_LOCALE.en,
   "/en/traslados": TRANSFER_BY_LOCALE.en,
   "/en/transfers-airport": TRANSFER_BY_LOCALE.en,
+  "/en/airport-transfers": TRANSFER_BY_LOCALE.en,
   "/en/excursiones-cruceros": TRANSFER_BY_LOCALE.en,
   "/en/cruise-excursions": TRANSFER_BY_LOCALE.en,
   "/en/casas": TRANSFER_BY_LOCALE.en,
@@ -69,6 +70,7 @@ export const LEGACY_PATH_REDIRECTS: Record<string, string> = {
   "/de/cancelar-reserva": "/de/buchung-stornieren",
   "/de/excursiones": TRANSFER_BY_LOCALE.de,
   "/de/traslados": TRANSFER_BY_LOCALE.de,
+  "/de/flughafen-transfer": TRANSFER_BY_LOCALE.de,
   "/de/excursiones-cruceros": TRANSFER_BY_LOCALE.de,
   "/de/casas": TRANSFER_BY_LOCALE.de,
   "/de/casas-vacacionales": TRANSFER_BY_LOCALE.de,

@@ -32,6 +32,7 @@ import {
   dbSaveTransfers,
 } from "@/lib/supabase/postgres";
 import { tourMatchesSlug } from "@/i18n/tour-slugs";
+import { revalidateSite } from "@/lib/revalidate-site";
 import { SETTINGS_STRING_KEYS } from "@/lib/settings-i18n";
 import {
   looksLikePastedWebHtml,
@@ -287,8 +288,10 @@ export async function getTransferDestinations(): Promise<TransferDestination[]> 
 }
 
 export async function saveTransfersData(data: TransfersData): Promise<void> {
-  if (await dbSaveTransfers(data)) return;
-  await writeJson("transfers.json", data);
+  if (!(await dbSaveTransfers(data))) {
+    await writeJson("transfers.json", data);
+  }
+  revalidateSite();
 }
 
 export async function upsertTransfer(
@@ -324,6 +327,8 @@ export async function createTransfer(
     priceExtraPerson: input.priceExtraPerson ?? 10,
     duration: input.duration || "30 min",
     distance: input.distance || "",
+    image: input.image || "",
+    description: input.description || "",
   };
   data.destinations.push(dest);
   await saveTransfersData(data);
@@ -628,6 +633,8 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
 
 export async function saveSettings(settings: SiteSettings): Promise<void> {
   const next = scrubSettingsHtml(settings);
-  if (await dbSaveSettings(next)) return;
-  await writeJson("settings.json", next);
+  if (!(await dbSaveSettings(next))) {
+    await writeJson("settings.json", next);
+  }
+  revalidateSite();
 }

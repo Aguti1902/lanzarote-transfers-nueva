@@ -6,6 +6,7 @@ import {
   dbGetUiTranslations,
   dbSaveUiTranslations,
 } from "@/lib/supabase/postgres";
+import { revalidateSite } from "@/lib/revalidate-site";
 
 export type UiTranslationOverrides = {
   es: Record<string, string>;
@@ -44,8 +45,10 @@ export async function saveUiTranslationOverrides(
     en: data.en || {},
     de: data.de || {},
   };
-  if (await dbSaveUiTranslations(payload)) return;
-  await writeCmsJson("uiTranslations.json", payload);
+  if (!(await dbSaveUiTranslations(payload))) {
+    await writeCmsJson("uiTranslations.json", payload);
+  }
+  revalidateSite();
 }
 
 export async function updateUiTranslations(

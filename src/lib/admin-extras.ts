@@ -363,17 +363,11 @@ async function getLocalCruiseGroups() {
 
 export async function getCruiseGroups() {
   const { isHubConfigured } = await import("@/lib/hub/config");
-  const { listHubCruiseGroups, seedHubCruiseGroups } = await import(
-    "@/lib/hub/cruise-groups"
-  );
-  if (isHubConfigured()) {
-    const remote = await listHubCruiseGroups();
-    if (remote && remote.length > 0) return remote;
-    const local = await getLocalCruiseGroups();
-    if (local.length) await seedHubCruiseGroups(local);
-    return local;
-  }
-  return getLocalCruiseGroups();
+  const { syncAndListHubCruiseGroups } = await import("@/lib/hub/cruise-groups");
+  const local = await getLocalCruiseGroups();
+  if (!isHubConfigured()) return local;
+  const shared = await syncAndListHubCruiseGroups(local);
+  return shared ?? local;
 }
 
 export async function upsertCruiseGroup(

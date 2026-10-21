@@ -113,6 +113,8 @@ export interface TransferDestination {
   priceExtraPerson: number;
   duration: string;
   distance: string;
+  image?: string;
+  description?: string;
 }
 
 export interface VacationHouseTranslation {

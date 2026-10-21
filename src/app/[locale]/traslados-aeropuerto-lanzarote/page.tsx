@@ -1,26 +1,15 @@
 import type { Metadata } from "next";
-import { CheckCircle2 } from "lucide-react";
-import { PageBodyText } from "@/components/PageBodyText";
-import { PageContentBlocks } from "@/components/PageContentBlocks";
-import { PageFaqs } from "@/components/PageFaqs";
-import { PageHero } from "@/components/PageHero";
-import { TransferBookingForm } from "@/components/TransferBookingForm";
-import { TransferRouteChips } from "@/components/TransferRouteChips";
-import { getSettings, getTransfersData } from "@/lib/content";
-import { formatPrice } from "@/lib/format";
-import {
-  localizeSettings,
-  localizeTransfers,
-} from "@/lib/localize-content";
-import { getDictionary } from "@/i18n/dictionaries";
-import { resolveLocale } from "@/i18n/get-locale";
+import { TransfersPageView } from "@/components/TransfersPageView";
+import { loadTransfersPage } from "@/lib/load-transfers-page";
 import { locales } from "@/i18n/config";
 import { localePath } from "@/i18n/path";
+import { resolveLocale } from "@/i18n/get-locale";
+import { getDictionary } from "@/i18n/dictionaries";
+import { getSettings } from "@/lib/content";
+import { localizeSettings } from "@/lib/localize-content";
 import { resolvePublicOrigin } from "@/lib/voucher";
-import type { TransferDirection } from "@/lib/transfer-price";
 
-/** ISR: HTML/RSC cacheados; CMS se refresca ~cada 60s o al guardar. */
-export const revalidate = 300;
+export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -44,141 +33,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TrasladosPage({ params }: Props) {
-  const locale = resolveLocale((await params).locale);
-  const dict = await getDictionary(locale);
-  const [transfers, settings] = await Promise.all([
-    getTransfersData().then((data) => localizeTransfers(data, locale)),
-    getSettings().then((s) => localizeSettings(s, locale)),
-  ]);
-
-  const chips: { label: string; direction: TransferDirection }[] = [
-    {
-      label: dict.transfers.airportHotel,
-      direction: "airport_to_hotel",
-    },
-    {
-      label: dict.transfers.hotelAirport,
-      direction: "hotel_to_airport",
-    },
-    { label: dict.transfers.roundTrip, direction: "return" },
-  ];
-
-  const faqs =
-    settings.transferFaqs && settings.transferFaqs.length > 0
-      ? settings.transferFaqs
-      : dict.transfers.faqs.map((f, i) => ({
-          id: `dict-tr-${i}`,
-          question: f.q,
-          answer: f.a,
-        }));
-
-  return (
-    <>
-      <PageHero
-        image={settings.transferHeroImage}
-        title={settings.transferTitle || dict.transfers.title}
-        subtitle={settings.transferIntro}
-        objectPosition={settings.transferHeroPosition || "50% 45%"}
-      />
-
-      <section className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-12">
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
-          <div className="min-w-0">
-            <PageBodyText
-              text={settings.transferText}
-              className="!mx-0 !max-w-none !px-0 !py-0"
-            />
-
-            <TransferRouteChips chips={chips} />
-
-            <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-              {transfers.highlights.map((h) => (
-                <li
-                  key={h}
-                  className="flex items-start gap-2 rounded-lg bg-white px-4 py-3 text-sm ring-1 ring-sand-line"
-                >
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ocean" />
-                  {h}
-                </li>
-              ))}
-            </ul>
-
-            <div id="precios" className="mt-12 overflow-hidden rounded-lg bg-white ring-1 ring-sand-line">
-              <div className="border-b border-sand-line bg-sky-soft px-4 py-3">
-                <h2 className="text-xl font-bold text-ink">
-                  {dict.transfers.tableTitle}
-                </h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[560px] text-left text-sm">
-                  <thead className="border-b border-sand-line text-ink-muted">
-                    <tr>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.destination}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.duration}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.oneWay}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.return}
-                      </th>
-                      <th className="px-4 py-3 font-medium">
-                        {dict.transfers.extraPerson}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transfers.destinations.map((d) => (
-                      <tr
-                        key={d.id}
-                        className="border-b border-sand-line last:border-0"
-                      >
-                        <td className="px-4 py-3.5 font-semibold text-ink">
-                          {d.name}
-                        </td>
-                        <td className="px-4 py-3.5 text-ink-muted">
-                          {d.duration}
-                        </td>
-                        <td className="px-4 py-3.5 font-medium text-ocean-deep">
-                          {formatPrice(d.priceOneWay)}
-                        </td>
-                        <td className="px-4 py-3.5 font-medium text-ocean-deep">
-                          {formatPrice(d.priceReturn)}
-                        </td>
-                        <td className="px-4 py-3.5 font-medium text-ocean-deep">
-                          {formatPrice(d.priceExtraPerson ?? 10)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="border-t border-sand-line px-4 py-3 text-xs text-ink-muted">
-                {dict.transfers.priceIncludes.replace("{n}", "4")}.
-              </p>
-            </div>
-          </div>
-
-          <aside className="lg:sticky lg:top-24 lg:self-start">
-            <TransferBookingForm destinations={transfers.destinations} />
-          </aside>
-        </div>
-      </section>
-
-      <PageContentBlocks
-        title={settings.transferBlocksTitle}
-        intro={settings.transferBlocksIntro}
-        blocks={settings.transferBlocks}
-      />
-
-      <PageFaqs
-        title={settings.transferFaqTitle || dict.transfers.faqTitle}
-        faqs={faqs}
-        tone="soft"
-      />
-    </>
-  );
+  const data = await loadTransfersPage((await params).locale);
+  return <TransfersPageView {...data} />;
 }

@@ -9,7 +9,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, locales, type Locale } from "@/i18n/config";
 import { getTripadvisorMeta } from "@/lib/reviews";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

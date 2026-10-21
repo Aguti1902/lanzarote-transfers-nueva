@@ -60,8 +60,16 @@ export async function GET(request: Request) {
       return NextResponse.json({ items: await getFeedback() });
     case "ports":
       return NextResponse.json({ items: await getCruisePorts() });
-    case "groups":
-      return NextResponse.json({ items: await getCruiseGroups() });
+    case "groups": {
+      const { getHubCruiseGroupsStatus } = await import(
+        "@/lib/hub/cruise-groups"
+      );
+      const items = await getCruiseGroups();
+      return NextResponse.json({
+        items,
+        hub: await getHubCruiseGroupsStatus(),
+      });
+    }
     case "redirects":
       return NextResponse.json({ items: await getRedirects() });
   }

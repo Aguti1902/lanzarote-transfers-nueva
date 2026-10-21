@@ -72,63 +72,83 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
+        permanent: true,
+      },
+      {
+        source: "/en/airport-transfers/:path*",
+        destination: "/en/lanzarote-airport-transfer/:path*",
+        permanent: true,
+      },
+      {
+        source: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
+        permanent: true,
+      },
+      {
+        source: "/de/flughafen-transfer/:path*",
+        destination: "/de/lanzarote-flughafen-transfer/:path*",
+        permanent: true,
+      },
+      {
         source: "/de/ausfluge",
-        destination: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
         permanent: true,
       },
       {
         source: "/de/ausfluge/:path*",
-        destination: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
         permanent: true,
       },
       {
         source: "/en/excursions",
-        destination: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
         permanent: true,
       },
       {
         source: "/en/excursions/:path*",
-        destination: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
         permanent: true,
       },
       {
         source: "/en/shore-excursions",
-        destination: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
         permanent: true,
       },
       {
         source: "/en/shore-excursions/:path*",
-        destination: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
         permanent: true,
       },
       {
         source: "/en/cruises",
-        destination: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
         permanent: true,
       },
       {
         source: "/en/cruise/:path*",
-        destination: "/en/airport-transfers",
+        destination: "/en/lanzarote-airport-transfer",
         permanent: true,
       },
       {
         source: "/de/ausfluege",
-        destination: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
         permanent: true,
       },
       {
         source: "/de/ausfluege/:path*",
-        destination: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
         permanent: true,
       },
       {
         source: "/de/kreuzfahrten",
-        destination: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
         permanent: true,
       },
       {
         source: "/de/kreuzfahrt/:path*",
-        destination: "/de/flughafen-transfer",
+        destination: "/de/lanzarote-flughafen-transfer",
         permanent: true,
       },
       {

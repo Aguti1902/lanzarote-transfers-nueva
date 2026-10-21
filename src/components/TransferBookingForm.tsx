@@ -21,12 +21,14 @@ const inputClass =
 
 export function TransferBookingForm({
   destinations,
+  defaultDestinationId = "",
 }: {
   destinations: TransferDestination[];
+  defaultDestinationId?: string;
 }) {
   const router = useRouter();
   const { dict, href, locale } = useLocale();
-  const [destination, setDestination] = useState(destinations[0]?.id || "");
+  const [destination, setDestination] = useState(defaultDestinationId);
   const [direction, setDirection] = useState<TransferDirection>(
     "airport_to_hotel"
   );
@@ -64,8 +66,7 @@ export function TransferBookingForm({
       window.removeEventListener(TRANSFER_DIRECTION_EVENT, onDirection);
   }, []);
 
-  const dest =
-    destinations.find((d) => d.id === destination) || destinations[0];
+  const dest = destinations.find((d) => d.id === destination);
   const minDate = minBookableDateIso();
   const total = useMemo(() => {
     if (!dest) return 0;
@@ -78,18 +79,10 @@ export function TransferBookingForm({
 
   const extraPax = transferExtraPassengers(adults);
 
-  if (!dest) {
-    return (
-      <p className="rounded-xl bg-surface p-6 text-ink-muted ring-1 ring-sand-line">
-        —
-      </p>
-    );
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!date || !time || !name || !email || !phone || !hotel) {
+    if (!dest || !date || !time || !name || !email || !phone || !hotel) {
       setError(dict.booking.fillRequired);
       return;
     }
@@ -181,7 +174,9 @@ export function TransferBookingForm({
             className={inputClass}
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
+            required
           >
+            <option value="">{dict.transferForm.destinationPlaceholder}</option>
             {destinations.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.name} — {dict.common.from} {formatPrice(d.priceOneWay)}
@@ -349,7 +344,7 @@ export function TransferBookingForm({
               String(TRANSFER_INCLUDED_PAX)
             )}
           </p>
-          {extraPax > 0 && (
+          {extraPax > 0 && dest && (
             <p className="mt-1 text-xs text-ink-muted">
               {dict.transfers.extraPerson}: +
               {formatPrice(

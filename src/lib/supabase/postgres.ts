@@ -175,6 +175,8 @@ function destToRow(dest: TransferDestination, index: number) {
     price_extra_person: dest.priceExtraPerson ?? 10,
     duration: dest.duration,
     distance: dest.distance,
+    image: dest.image ?? "",
+    description: dest.description ?? "",
     sort_order: index,
     active: true,
   };
@@ -190,6 +192,8 @@ function rowToDest(row: Record<string, unknown>): TransferDestination {
     priceExtraPerson: Number(row.price_extra_person) || 10,
     duration: String(row.duration || ""),
     distance: String(row.distance || ""),
+    image: String(row.image || ""),
+    description: String(row.description || ""),
   };
 }
 
@@ -230,12 +234,20 @@ export async function dbSaveTransfers(data: TransfersData): Promise<boolean> {
       if (error) throw error;
     }
     if (data.destinations.length) {
-      const { error } = await sb
+      const rows = data.destinations.map((dest, index) =>
+        destToRow(dest, index)
+      );
+      let { error } = await sb
         .from("transfer_destinations")
-        .upsert(
-          data.destinations.map((dest, index) => destToRow(dest, index)),
-          { onConflict: "id" }
+        .upsert(rows, { onConflict: "id" });
+      if (error && /image|description/i.test(error.message)) {
+        const slim = rows.map(
+          ({ image: _image, description: _description, ...rest }) => rest
         );
+        ({ error } = await sb
+          .from("transfer_destinations")
+          .upsert(slim, { onConflict: "id" }));
+      }
       if (error) throw error;
     }
     const { error: metaError } = await sb.from("transfer_meta").upsert(

@@ -1,5 +1,6 @@
 import { isLocale, type Locale } from "./config";
 import { remapExcursionPath } from "./tour-slugs";
+import { destinationAliasToInternal } from "@/lib/destination-copy";
 
 /**
  * Rutas canónicas internas = carpetas bajo `app/[locale]/…` (siempre en español).
@@ -26,8 +27,8 @@ export const ROUTE_LOCALES = [
   { es: "/sobre-nosotros", en: "/about-us", de: "/uber-uns" },
   {
     es: "/traslados-aeropuerto-lanzarote",
-    en: "/airport-transfers",
-    de: "/flughafen-transfer",
+    en: "/lanzarote-airport-transfer",
+    de: "/lanzarote-flughafen-transfer",
   },
   { es: "/contacto", en: "/contact", de: "/kontakt" },
   { es: "/factura", en: "/invoice", de: "/rechnung" },
@@ -42,9 +43,12 @@ export const ROUTE_LOCALES = [
 const ALIASES: Record<string, string> = {
   "/über-uns": "/uber-uns",
   "/uber-uns": "/uber-uns",
-  "/transfers-airport": "/airport-transfers",
+  "/transfers-airport": "/lanzarote-airport-transfer",
+  "/airport-transfers": "/lanzarote-airport-transfer",
+  "/flughafen-transfer": "/lanzarote-flughafen-transfer",
   "/traslados-aeropuerto": "/traslados-aeropuerto-lanzarote",
   "/traslados": "/traslados-aeropuerto-lanzarote",
+  "/aeropuerto-playa-blanca": "/traslados-aeropuerto-lanzarote/playa-blanca",
 };
 
 function splitPathAndQuery(path: string): { pathname: string; search: string } {
@@ -102,7 +106,8 @@ function detectSlugLocale(pathname: string): Locale | null {
  */
 export function toInternalPath(path: string): string {
   const { pathname, search } = splitPathAndQuery(path);
-  const clean = applyAlias(normalizePathname(pathname));
+  const aliased = destinationAliasToInternal(normalizePathname(pathname));
+  const clean = applyAlias(normalizePathname(aliased || pathname));
   if (clean === "/") return search ? `/${search}` : "/";
 
   for (const locale of ["es", "en", "de"] as Locale[]) {
