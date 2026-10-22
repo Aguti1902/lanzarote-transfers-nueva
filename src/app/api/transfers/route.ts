@@ -3,6 +3,7 @@ import {
   createTransfer,
   deleteTransfer,
   getTransfersData,
+  updateTransferClosedDates,
   updateTransferHighlights,
   upsertTransfer,
 } from "@/lib/content";
@@ -27,6 +28,10 @@ export async function POST(request: Request) {
     if (body.action === "highlights") {
       const highlights = await updateTransferHighlights(body.highlights || []);
       return NextResponse.json({ highlights });
+    }
+    if (body.action === "closedDates") {
+      const closedDates = await updateTransferClosedDates(body.closedDates || []);
+      return NextResponse.json({ closedDates });
     }
     if (!body.name) {
       return NextResponse.json({ error: "Falta el nombre" }, { status: 400 });

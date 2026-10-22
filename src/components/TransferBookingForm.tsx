@@ -22,9 +22,11 @@ const inputClass =
 export function TransferBookingForm({
   destinations,
   defaultDestinationId = "",
+  closedDates = [],
 }: {
   destinations: TransferDestination[];
   defaultDestinationId?: string;
+  closedDates?: string[];
 }) {
   const router = useRouter();
   const { dict, href, locale } = useLocale();
@@ -88,6 +90,13 @@ export function TransferBookingForm({
     }
     if (!isServiceDateWithinLeadTime(date, time)) {
       setError(dict.booking.minLeadTime);
+      return;
+    }
+    if (
+      closedDates.includes(date) ||
+      (direction === "return" && returnDate && closedDates.includes(returnDate))
+    ) {
+      setError(dict.booking.dateClosed);
       return;
     }
     if (direction === "return" && (!returnDate || !returnTime)) {

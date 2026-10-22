@@ -350,6 +350,7 @@ export type Dictionary = {
     other: string;
     dateUnavailable: string;
     minLeadTime: string;
+    dateClosed: string;
     pickupTimeNote: string;
     moreDetails: string;
   };
@@ -944,6 +945,7 @@ const es: Dictionary = {
       "Ese día no hay excursión. Elija una fecha disponible en el calendario.",
     minLeadTime:
       "Debe reservar con al menos 48 horas de antelación para evitar overbooking.",
+    dateClosed: "Esa fecha está cerrada. Elige otro día.",
     pickupTimeNote:
       "La hora de recogida se confirma por WhatsApp / email según su zona.",
     moreDetails: "Hotel, barco y notas (opcional)",
@@ -1497,6 +1499,7 @@ const en: Dictionary = {
       "No excursion on that day. Please choose an available date.",
     minLeadTime:
       "Bookings require at least 48 hours' notice to avoid overbooking.",
+    dateClosed: "That date is closed. Please choose another day.",
     pickupTimeNote:
       "Pick-up time is confirmed by WhatsApp / email according to your area.",
     moreDetails: "Hotel, ship and notes (optional)",
@@ -2059,6 +2062,7 @@ const de: Dictionary = {
       "An diesem Tag gibt es keinen Ausflug. Bitte wählen Sie ein verfügbares Datum.",
     minLeadTime:
       "Buchungen sind nur mit mindestens 48 Stunden Vorlauf möglich, um Overbooking zu vermeiden.",
+    dateClosed: "Dieses Datum ist geschlossen. Bitte wählen Sie einen anderen Tag.",
     pickupTimeNote:
       "Die Abholzeit wird per WhatsApp / E-Mail je nach Zone bestätigt.",
     moreDetails: "Hotel, Schiff und Notizen (optional)",

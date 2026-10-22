@@ -272,12 +272,21 @@ export async function writeCmsJson(file: string, data: unknown): Promise<void> {
       );
     }
 
-    const updated = await sb.storage.from(CMS_BUCKET).update(file, payload, options);
-    if (updated.error) {
+    let updateError: { message?: string } | null = null;
+    try {
+      const updated = await sb.storage.from(CMS_BUCKET).update(file, payload, options);
+      updateError = updated.error;
+    } catch (error) {
+      updateError =
+        error instanceof Error ? error : { message: "Object not found" };
+    }
+    if (updateError) {
       const uploaded = await sb.storage
         .from(CMS_BUCKET)
         .upload(file, payload, options);
-      if (uploaded.error) throw uploaded.error;
+      if (uploaded.error && !/already exists|duplicate/i.test(uploaded.error.message)) {
+        throw uploaded.error;
+      }
     }
 
     // Copia permanente de shore: no la borra la retención diaria.

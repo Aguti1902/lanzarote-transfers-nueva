@@ -16,9 +16,11 @@ import type { TransferDestination } from "@/types";
 export function DestinationSheet({
   destination,
   destinations,
+  closedDates = [],
 }: {
   destination: TransferDestination;
   destinations: TransferDestination[];
+  closedDates?: string[];
 }) {
   const router = useRouter();
   const { dict, href, locale } = useLocale();
@@ -96,6 +98,7 @@ export function DestinationSheet({
             <TransferBookingForm
               destinations={destinations}
               defaultDestinationId={destination.id}
+              closedDates={closedDates}
             />
           </div>
         </div>

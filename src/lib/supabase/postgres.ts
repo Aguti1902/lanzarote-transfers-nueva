@@ -165,15 +165,25 @@ export async function dbSaveInvoices(invoices: Invoice[]): Promise<boolean> {
 
 /* ── Transfers ── */
 
-/** Respaldo de foto y texto si la tabla aún no tiene esas columnas. */
+/** Respaldo de foto, texto y fechas cerradas si faltan columnas. */
 const DEST_MEDIA_MARK = "@@dest-media@@";
+const CLOSED_DATES_MARK = "@@closed-dates@@";
 
 type DestMedia = Record<string, { image?: string; description?: string }>;
 
-function splitHighlights(raw: unknown): { highlights: string[]; media: DestMedia } {
+function isRuntimeMark(item: string): boolean {
+  return item.startsWith(DEST_MEDIA_MARK) || item.startsWith(CLOSED_DATES_MARK);
+}
+
+function splitHighlights(raw: unknown): {
+  highlights: string[];
+  media: DestMedia;
+  closedDates: string[];
+} {
   const list = Array.isArray(raw) ? raw.map((item) => String(item)) : [];
   const mark = list.find((item) => item.startsWith(DEST_MEDIA_MARK));
-  const highlights = list.filter((item) => !item.startsWith(DEST_MEDIA_MARK));
+  const closedMark = list.find((item) => item.startsWith(CLOSED_DATES_MARK));
+  const highlights = list.filter((item) => !isRuntimeMark(item));
   let media: DestMedia = {};
   if (mark) {
     try {
@@ -183,13 +193,28 @@ function splitHighlights(raw: unknown): { highlights: string[]; media: DestMedia
       media = {};
     }
   }
-  return { highlights, media };
+  let closedDates: string[] = [];
+  if (closedMark) {
+    try {
+      const parsed = JSON.parse(closedMark.slice(CLOSED_DATES_MARK.length));
+      if (Array.isArray(parsed)) {
+        closedDates = parsed.map((item) => String(item).slice(0, 10)).filter(Boolean);
+      }
+    } catch {
+      closedDates = [];
+    }
+  }
+  return { highlights, media, closedDates };
 }
 
-function packHighlights(highlights: string[], media: DestMedia): string[] {
+function packHighlights(
+  highlights: string[],
+  media: DestMedia,
+  closedDates: string[] = []
+): string[] {
   const clean = (highlights || [])
     .map((item) => item.trim())
-    .filter((item) => item && !item.startsWith(DEST_MEDIA_MARK));
+    .filter((item) => item && !isRuntimeMark(item));
   const useful: DestMedia = {};
   for (const [id, value] of Object.entries(media || {})) {
     const image = value?.image?.trim() || "";
@@ -199,6 +224,8 @@ function packHighlights(highlights: string[], media: DestMedia): string[] {
   if (Object.keys(useful).length) {
     clean.push(DEST_MEDIA_MARK + JSON.stringify(useful));
   }
+  const dates = [...new Set(closedDates.map((d) => d.slice(0, 10)).filter(Boolean))].sort();
+  if (dates.length) clean.push(CLOSED_DATES_MARK + JSON.stringify(dates));
   return clean;
 }
 
@@ -212,6 +239,66 @@ function mediaFromDestinations(destinations: TransferDestination[]): DestMedia {
     }
   }
   return media;
+}
+
+async function readSettingsRuntime(): Promise<{
+  highlights: string[];
+  media: DestMedia;
+  closedDates: string[];
+} | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("site_settings")
+    .select("data")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error || !data?.data || typeof data.data !== "object") return null;
+  const runtime = (data.data as { _transferRuntime?: unknown })._transferRuntime;
+  if (!runtime || typeof runtime !== "object") return null;
+  const raw = runtime as {
+    highlights?: unknown;
+    media?: DestMedia;
+    closedDates?: unknown;
+  };
+  return {
+    highlights: Array.isArray(raw.highlights) ? raw.highlights.map(String) : [],
+    media: raw.media && typeof raw.media === "object" ? raw.media : {},
+    closedDates: Array.isArray(raw.closedDates)
+      ? raw.closedDates.map((item) => String(item).slice(0, 10))
+      : [],
+  };
+}
+
+async function writeSettingsRuntime(packed: string[]): Promise<void> {
+  const parsed = splitHighlights(packed);
+  const sb = getSupabaseAdmin();
+  const { data, error } = await sb
+    .from("site_settings")
+    .select("data")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error) throw error;
+  const current =
+    data?.data && typeof data.data === "object"
+      ? (data.data as Record<string, unknown>)
+      : {};
+  const next = {
+    ...current,
+    _transferRuntime: {
+      highlights: parsed.highlights,
+      media: parsed.media,
+      closedDates: parsed.closedDates,
+    },
+  };
+  let { error: writeError } = await sb.from("site_settings").upsert(
+    { id: 1, data: next, updated_at: new Date().toISOString() },
+    { onConflict: "id" }
+  );
+  if (writeError && /updated_at/i.test(writeError.message)) {
+    ({ error: writeError } = await sb
+      .from("site_settings")
+      .upsert({ id: 1, data: next }, { onConflict: "id" }));
+  }
+  if (writeError) throw writeError;
 }
 
 async function upsertTransferMeta(highlights: string[]): Promise<void> {
@@ -267,15 +354,36 @@ function rowToDest(row: Record<string, unknown>): TransferDestination {
 export async function dbGetTransfers(): Promise<TransfersData | null> {
   return runDb("transfers-get", async () => {
     const sb = getSupabaseAdmin();
-    const [{ data: dests, error: destError }, { data: meta, error: metaError }] =
-      await Promise.all([
-        sb.from("transfer_destinations").select("*").order("sort_order"),
-        sb.from("transfer_meta").select("highlights").eq("id", 1).maybeSingle(),
-      ]);
+    let destQuery = await sb
+      .from("transfer_destinations")
+      .select("*")
+      .order("sort_order");
+    if (destQuery.error && /sort_order/i.test(destQuery.error.message)) {
+      destQuery = await sb.from("transfer_destinations").select("*");
+    }
+    const { data: meta, error: metaError } = await sb
+      .from("transfer_meta")
+      .select("highlights")
+      .eq("id", 1)
+      .maybeSingle();
+    const dests = destQuery.data;
+    const destError = destQuery.error;
     if (destError) throw destError;
-    if (metaError) throw metaError;
     if (!dests?.length) return null;
-    const { highlights, media } = splitHighlights(meta?.highlights);
+    let highlights: string[] = [];
+    let media: DestMedia = {};
+    let closedDates: string[] = [];
+    if (!metaError && meta) {
+      ({ highlights, media, closedDates } = splitHighlights(meta.highlights));
+    }
+    if (!highlights.length && !Object.keys(media).length && !closedDates.length) {
+      const runtime = await readSettingsRuntime();
+      if (runtime) {
+        highlights = runtime.highlights;
+        media = runtime.media;
+        closedDates = runtime.closedDates;
+      }
+    }
     return {
       destinations: dests.map((row) => {
         const dest = rowToDest(row as Record<string, unknown>);
@@ -288,6 +396,7 @@ export async function dbGetTransfers(): Promise<TransfersData | null> {
         };
       }),
       highlights,
+      closedDates,
     };
   });
 }
@@ -302,8 +411,10 @@ export async function dbSaveTransferHighlights(
       .eq("id", 1)
       .maybeSingle();
     if (readError) throw readError;
-    const { media } = splitHighlights(meta?.highlights);
-    await upsertTransferMeta(packHighlights(highlights, media));
+    const parsed = splitHighlights(meta?.highlights);
+    await upsertTransferMeta(
+      packHighlights(highlights, parsed.media, parsed.closedDates)
+    );
     return true;
   });
   return ok === true;
@@ -369,15 +480,22 @@ export async function dbSaveTransfers(data: TransfersData): Promise<boolean> {
       .eq("id", 1)
       .maybeSingle();
     if (metaReadError) throw metaReadError;
-    const previous = splitHighlights(meta?.highlights).media;
+    const previous = splitHighlights(meta?.highlights);
     const media = {
-      ...previous,
+      ...previous.media,
       ...mediaFromDestinations(data.destinations),
     };
     for (const dest of data.destinations) {
       if (!dest.image?.trim() && !dest.description?.trim()) delete media[dest.id];
     }
-    await upsertTransferMeta(packHighlights(data.highlights ?? [], media));
+    const closedDates = data.closedDates ?? previous.closedDates;
+    const packed = packHighlights(data.highlights ?? [], media, closedDates);
+    try {
+      await upsertTransferMeta(packed);
+    } catch (metaWriteError) {
+      warnSupabaseFallback("transfer-meta", metaWriteError as Error);
+      await writeSettingsRuntime(packed);
+    }
     return true;
     })();
   } catch (error) {

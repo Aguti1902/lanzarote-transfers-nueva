@@ -238,6 +238,18 @@ export async function POST(request: Request) {
 
     if (type === "transfer" && transferPayload) {
       const transfers = await getTransfersData();
+      const closed = new Set(transfers.closedDates || []);
+      const serviceDate = String(date).slice(0, 10);
+      const returnDate =
+        typeof transferPayload.returnDate === "string"
+          ? transferPayload.returnDate.slice(0, 10)
+          : "";
+      if (closed.has(serviceDate) || (returnDate && closed.has(returnDate))) {
+        return NextResponse.json(
+          { error: "Esa fecha está cerrada. Elige otro día." },
+          { status: 400 }
+        );
+      }
       const destId =
         typeof transferPayload.destinationId === "string"
           ? transferPayload.destinationId

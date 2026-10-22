@@ -18,6 +18,7 @@ export default async function DestinationModalPage({ params }: Props) {
     <DestinationSheet
       destination={dest}
       destinations={data.transfers.destinations}
+      closedDates={data.transfers.closedDates || []}
     />
   );
 }

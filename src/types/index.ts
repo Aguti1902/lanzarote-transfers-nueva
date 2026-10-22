@@ -355,6 +355,8 @@ export interface SeoRedirect {
 export interface TransfersData {
   destinations: TransferDestination[];
   highlights: string[];
+  /** Días YYYY-MM-DD en los que no se aceptan reservas de traslado. */
+  closedDates?: string[];
 }
 
 export interface CruiseCall {

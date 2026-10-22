@@ -47,6 +47,8 @@ export default function AdminTrasladosPage() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<TransferDestination>(emptyDest());
   const [highlightsText, setHighlightsText] = useState("");
+  const [closedDates, setClosedDates] = useState<string[]>([]);
+  const [closeDate, setCloseDate] = useState("");
   const [copyLocale, setCopyLocale] = useState<Locale>("es");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -65,6 +67,7 @@ export default function AdminTrasladosPage() {
     setDestinations(data.destinations || []);
     setHighlights(data.highlights || []);
     setHighlightsText(arrayToLines(data.highlights || []));
+    setClosedDates(Array.isArray(data.closedDates) ? data.closedDates : []);
     setHighlightsEn(arrayToLines(enData.transfers?.highlights || []));
     setHighlightsDe(arrayToLines(deData.transfers?.highlights || []));
     const enDest: DestCopyMap = {};
@@ -171,6 +174,23 @@ export default function AdminTrasladosPage() {
       method: "DELETE",
     });
     await load();
+  }
+
+  async function saveClosedDates(next: string[]) {
+    setMessage("");
+    setError("");
+    const res = await fetch("/api/transfers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "closedDates", closedDates: next }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || "No se pudo cerrar la fecha");
+      return;
+    }
+    setClosedDates(data.closedDates || next);
+    setMessage("Fechas cerradas actualizadas. Ese día ya no admite reservas.");
   }
 
   async function saveHighlights() {
@@ -478,6 +498,62 @@ export default function AdminTrasladosPage() {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">
+        <h2 className="font-display text-xl">Cerrar una fecha</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          Si ese día ya no hay guías ni vehículo, ciérralo aquí. La web deja de
+          aceptar reservas de traslado para esa fecha.
+        </p>
+        <div className="mt-4 flex flex-wrap items-end gap-3">
+          <Field label="Día">
+            <input
+              type="date"
+              className={adminInput}
+              value={closeDate}
+              onChange={(e) => setCloseDate(e.target.value)}
+            />
+          </Field>
+          <button
+            type="button"
+            onClick={() => {
+              if (!closeDate) {
+                setError("Elige una fecha");
+                return;
+              }
+              const next = [...new Set([...closedDates, closeDate])].sort();
+              setCloseDate("");
+              void saveClosedDates(next);
+            }}
+            className="rounded-md bg-ocean px-5 py-2 text-sm font-semibold text-white hover:bg-ocean-deep"
+          >
+            Cerrar fecha
+          </button>
+        </div>
+        {closedDates.length === 0 ? (
+          <p className="mt-4 text-sm text-ink-muted">No hay fechas cerradas.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-sand-line rounded-lg ring-1 ring-sand-line">
+            {closedDates.map((day) => (
+              <li
+                key={day}
+                className="flex items-center justify-between gap-3 px-4 py-2 text-sm"
+              >
+                <span className="font-semibold">{day}</span>
+                <button
+                  type="button"
+                  className="text-coral"
+                  onClick={() =>
+                    void saveClosedDates(closedDates.filter((item) => item !== day))
+                  }
+                >
+                  Abrir
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-sand-line">

@@ -93,7 +93,10 @@ export function TransfersPageView({
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            <TransferBookingForm destinations={transfers.destinations} />
+            <TransferBookingForm
+              destinations={transfers.destinations}
+              closedDates={transfers.closedDates || []}
+            />
           </aside>
         </div>
       </section>

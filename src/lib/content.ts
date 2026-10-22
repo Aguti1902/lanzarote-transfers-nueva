@@ -288,20 +288,24 @@ export async function getTransferDestinations(): Promise<TransferDestination[]> 
   return (await getTransfersData()).destinations;
 }
 
+async function readTransfersMutable(): Promise<TransfersData> {
+  const fromDb = await dbGetTransfers();
+  if (fromDb) return fromDb;
+  return readLocalCmsJson<TransfersData>("transfers.json");
+}
+
 export async function saveTransfersData(data: TransfersData): Promise<void> {
-  if (await dbSaveTransfers(data)) {
-    revalidateSite();
-    return;
+  const saved = await dbSaveTransfers(data);
+  if (!saved) {
+    await writeJson("transfers.json", data);
   }
-  await writeJson("transfers.json", data);
   revalidateSite();
 }
 
 export async function upsertTransfer(
   dest: TransferDestination
 ): Promise<TransferDestination> {
-  const fromDb = await dbGetTransfers();
-  const data = fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
+  const data = await readTransfersMutable();
   const idx = data.destinations.findIndex((d) => d.id === dest.id);
   if (idx === -1) data.destinations.push(dest);
   else data.destinations[idx] = dest;
@@ -312,9 +316,7 @@ export async function upsertTransfer(
 export async function createTransfer(
   input: Partial<TransferDestination> & Pick<TransferDestination, "name">
 ): Promise<TransferDestination> {
-  const fromDb = await dbGetTransfers();
-  const data =
-    fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
+  const data = await readTransfersMutable();
   const baseSlug = slugify(input.slug || input.name);
   let slug = baseSlug;
   let n = 2;
@@ -339,14 +341,22 @@ export async function createTransfer(
 }
 
 export async function deleteTransfer(id: string): Promise<boolean> {
-  const fromDb = await dbGetTransfers();
-  const data =
-    fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
+  const data = await readTransfersMutable();
   const next = data.destinations.filter((d) => d.id !== id);
   if (next.length === data.destinations.length) return false;
   data.destinations = next;
   await saveTransfersData(data);
   return true;
+}
+
+export async function updateTransferClosedDates(
+  closedDates: string[]
+): Promise<string[]> {
+  const clean = [...new Set(closedDates.map((d) => String(d).slice(0, 10)).filter(Boolean))].sort();
+  const data = await readTransfersMutable();
+  data.closedDates = clean;
+  await saveTransfersData(data);
+  return clean;
 }
 
 export async function updateTransferHighlights(
@@ -357,9 +367,7 @@ export async function updateTransferHighlights(
     revalidateSite();
     return clean;
   }
-  const fromDb = await dbGetTransfers();
-  const data =
-    fromDb ?? (await readJsonFresh<TransfersData>("transfers.json"));
+  const data = await readTransfersMutable();
   data.highlights = clean;
   await saveTransfersData(data);
   return clean;

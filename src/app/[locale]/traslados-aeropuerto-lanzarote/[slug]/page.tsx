@@ -55,6 +55,7 @@ export default async function DestinationPage({ params }: Props) {
       <DestinationSheet
         destination={dest}
         destinations={data.transfers.destinations}
+        closedDates={data.transfers.closedDates || []}
       />
     </>
   );
