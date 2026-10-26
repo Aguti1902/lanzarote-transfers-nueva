@@ -768,10 +768,10 @@ const es: Dictionary = {
     welcome: "¡Bienvenidos a Lanzarote!",
     mission: "Misión",
     missionText:
-      "Ofrecer traslados privados puntuales y cómodos entre el aeropuerto de Lanzarote y su alojamiento.",
+      "Facilitar la llegada y la salida de quienes visitan Lanzarote mediante un servicio de transporte privado, cómodo y bien organizado, con atención personal y el conocimiento de un equipo local.",
     vision: "Visión",
     visionText:
-      "Ser la referencia local en traslados privados en Lanzarote.",
+      "Ser una empresa de traslados reconocida por la confianza de sus clientes, la cercanía de su equipo y la calidad de un servicio que refleja nuestra forma de recibir a quienes visitan Lanzarote.",
     values: "Nuestros valores",
     promise: "Nuestra promesa",
     contact: "Contactar",
@@ -1327,9 +1327,10 @@ const en: Dictionary = {
     welcome: "Welcome to Lanzarote!",
     mission: "Mission",
     missionText:
-      "Deliver punctual, comfortable private transfers between Lanzarote Airport and your stay.",
+      "To make arriving in and departing from Lanzarote easier through comfortable, well-organised private transport, combining personal attention with the local knowledge of our team.",
     vision: "Vision",
-    visionText: "Be the local reference for private transfers in Lanzarote.",
+    visionText:
+      "To be a trusted local transfer company, recognised for the confidence of our customers, the friendliness of our team and the quality of a service that reflects the way we welcome visitors to Lanzarote.",
     values: "Our values",
     promise: "Our promise",
     contact: "Contact",
@@ -1884,10 +1885,10 @@ const de: Dictionary = {
     welcome: "Willkommen auf Lanzarote!",
     mission: "Mission",
     missionText:
-      "Pünktliche, komfortable Privattranfers zwischen dem Flughafen Lanzarote und Ihrer Unterkunft.",
+      "Wir möchten unseren Gästen die Ankunft auf Lanzarote und die Abreise erleichtern – mit komfortablen, gut organisierten Privattransfers, persönlicher Betreuung und der Ortskenntnis unseres einheimischen Teams.",
     vision: "Vision",
     visionText:
-      "Die lokale Referenz für private Transfers auf Lanzarote sein.",
+      "Wir möchten ein vertrauenswürdiges lokales Transferunternehmen sein, das für die Zufriedenheit seiner Kunden, die Freundlichkeit seines Teams und die Qualität eines Services bekannt ist, der unsere Gastfreundschaft auf Lanzarote widerspiegelt.",
     values: "Unsere Werte",
     promise: "Unser Versprechen",
     contact: "Kontakt",
@@ -2187,6 +2188,34 @@ function sanitizeDictionary(dict: Dictionary): Dictionary {
   };
 }
 
+const LEGACY_ABOUT_COPY: Record<string, string> = {
+  "Ofrecer traslados privados puntuales y cómodos entre el aeropuerto de Lanzarote y su alojamiento.":
+    es.about.missionText,
+  "Ser la referencia local en traslados privados en Lanzarote.":
+    es.about.visionText,
+  "Deliver punctual, comfortable private transfers between Lanzarote Airport and your stay.":
+    en.about.missionText,
+  "Be the local reference for private transfers in Lanzarote.": en.about.visionText,
+  "Pünktliche, komfortable Privattranfers zwischen dem Flughafen Lanzarote und Ihrer Unterkunft.":
+    de.about.missionText,
+  "Die lokale Referenz für private Transfers auf Lanzarote sein.":
+    de.about.visionText,
+};
+
+function refreshAboutCopy(dict: Dictionary): Dictionary {
+  const missionText = LEGACY_ABOUT_COPY[dict.about.missionText];
+  const visionText = LEGACY_ABOUT_COPY[dict.about.visionText];
+  if (!missionText && !visionText) return dict;
+  return {
+    ...dict,
+    about: {
+      ...dict.about,
+      ...(missionText ? { missionText } : {}),
+      ...(visionText ? { visionText } : {}),
+    },
+  };
+}
+
 export async function getDictionary(locale: Locale): Promise<Dictionary> {
   const base = dictionaries[locale] ?? dictionaries.es;
   const { applyTranslationOverrides, getOverridesForLocale } = await import(
@@ -2199,7 +2228,7 @@ export async function getDictionary(locale: Locale): Promise<Dictionary> {
       ([key]) => !/^home\.advantages\.\d+\.bold$/.test(key)
     )
   );
-  return sanitizeDictionary(applyTranslationOverrides(base, cleaned));
+  return refreshAboutCopy(sanitizeDictionary(applyTranslationOverrides(base, cleaned)));
 }
 
 export function getDictionarySync(locale: Locale): Dictionary {
