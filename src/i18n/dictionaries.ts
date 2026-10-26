@@ -47,9 +47,13 @@ export type Dictionary = {
     toursKicker: string;
     transfersKicker: string;
     transfersTitle: string;
+    transfersBody: string;
+    transfersPoints: string[];
     transfersCta: string;
     cruisesKicker: string;
     cruisesTitle: string;
+    cruisesBody: string;
+    cruisesPoints: string[];
     cruisesCta: string;
     agencyKicker: string;
     agencyTitle: string;
@@ -58,6 +62,7 @@ export type Dictionary = {
     islandKicker: string;
     islandTitle: string;
     islandBody: string;
+    islandMore: string;
     islandCta: string;
     reviewsKicker: string;
     reviewsTitle: string;
@@ -500,20 +505,36 @@ const es: Dictionary = {
     toursKicker: "Rutas",
     transfersKicker: "Sin esperas",
     transfersTitle: "Traslados privados en Lanzarote",
+    transfersBody:
+      "Desde el momento en que aterrizas en Lanzarote, nos ocupamos de tu traslado. Un chófer profesional, un vehículo privado y la tranquilidad de llegar directamente a tu destino.",
+    transfersPoints: [
+      "Recepción en el aeropuerto",
+      "Vehículo privado para tu grupo",
+      "Tarifa por vehículo",
+    ],
     transfersCta: "Reservar traslado",
-    cruisesKicker: "Flota",
-    cruisesTitle: "Vehículos propios y chófer local",
+    cruisesKicker: "Flota propia",
+    cruisesTitle: "Tu vehículo privado, tu chófer local",
+    cruisesBody:
+      "Viaja en un vehículo reservado para ti y tus acompañantes, con un chófer que conoce Lanzarote y te lleva directamente a tu destino.",
+    cruisesPoints: [
+      "Vehículos climatizados",
+      "Chóferes locales",
+      "Recogida en hoteles, villas y apartamentos",
+    ],
     cruisesCta: "Ver destinos",
     agencyKicker: "Empresa familiar",
     agencyTitle: "Especialistas en traslados",
     agencyBody:
       "Minibuses y vehículos privados climatizados, con chóferes que conocen cada zona de la isla.",
     agencyCta: "Conocer la empresa",
-    islandKicker: "La isla",
-    islandTitle: "Empiece sus vacaciones al aterrizar",
+    islandKicker: "Descubre Lanzarote",
+    islandTitle: "Tu traslado es solo el comienzo",
     islandBody:
-      "Lanzarote es Reserva de la Biosfera: silencio, calma y un paisaje volcánico único. Nosotros nos ocupamos del trayecto para que usted llegue descansado a su hotel.",
-    islandCta: "Reservar traslado",
+      "Lanzarote es mucho más que sol y playas. Descubre sus paisajes volcánicos, sus pueblos tradicionales y los espacios únicos creados por César Manrique.",
+    islandMore:
+      "Con Lanzarote Experience Tours puedes explorar la isla en excursiones privadas o en grupos pequeños, acompañados por guías oficiales locales.",
+    islandCta: "Descubrir excursiones",
     reviewsKicker: "Tripadvisor",
     reviewsTitle: "Lo que dicen los viajeros",
     reviewsSubtitle:
@@ -1101,22 +1122,38 @@ const en: Dictionary = {
     ],
     toursTitle: "Airport destinations",
     toursKicker: "Routes",
-    transfersKicker: "No waiting",
-    transfersTitle: "Private transfers in Lanzarote",
-    transfersCta: "Book a transfer",
-    cruisesKicker: "Fleet",
-    cruisesTitle: "Our own vehicles and local drivers",
-    cruisesCta: "See destinations",
+    transfersKicker: "No unnecessary waiting",
+    transfersTitle: "Private Transfers in Lanzarote",
+    transfersBody:
+      "From the moment you land in Lanzarote, we take care of your transfer. A professional driver, a private vehicle and the peace of mind of travelling directly to your destination.",
+    transfersPoints: [
+      "Airport meet & greet",
+      "Private vehicle for your group",
+      "Per-vehicle pricing",
+    ],
+    transfersCta: "Book your transfer",
+    cruisesKicker: "Our own fleet",
+    cruisesTitle: "Your Private Vehicle, Your Local Driver",
+    cruisesBody:
+      "Travel in a vehicle reserved exclusively for you and your companions, with a local driver who knows Lanzarote and takes you directly to your destination.",
+    cruisesPoints: [
+      "Air-conditioned vehicles",
+      "Experienced local drivers",
+      "Pick-up from hotels, villas and apartments",
+    ],
+    cruisesCta: "Explore destinations",
     agencyKicker: "Family business",
     agencyTitle: "Transfer specialists",
     agencyBody:
       "Air-conditioned minibuses and private cars, driven by locals who know every area of the island.",
     agencyCta: "Meet the company",
-    islandKicker: "The island",
-    islandTitle: "Your holiday starts on landing",
+    islandKicker: "Discover Lanzarote",
+    islandTitle: "Your transfer is just the beginning",
     islandBody:
-      "Lanzarote is a Biosphere Reserve of silence, calm and unique volcanic landscapes. We take care of the journey so you arrive at your hotel rested.",
-    islandCta: "Book a transfer",
+      "Lanzarote has so much more to offer than sunshine and beaches. Discover its volcanic landscapes, traditional villages and the remarkable spaces created by César Manrique.",
+    islandMore:
+      "With Lanzarote Experience Tours, you can explore the island on private or small-group excursions, accompanied by official local guides.",
+    islandCta: "Explore our tours",
     reviewsKicker: "Tripadvisor",
     reviewsTitle: "What travellers say",
     reviewsSubtitle:
@@ -1656,22 +1693,38 @@ const de: Dictionary = {
     ],
     toursTitle: "Ziele ab dem Flughafen",
     toursKicker: "Routen",
-    transfersKicker: "Ohne Warten",
+    transfersKicker: "Ohne unnötige Wartezeiten",
     transfersTitle: "Private Transfers auf Lanzarote",
+    transfersBody:
+      "Ab Ihrer Ankunft auf Lanzarote kümmern wir uns um Ihren Transfer. Ein professioneller Fahrer, ein privates Fahrzeug und die Gewissheit, bequem und direkt an Ihr Ziel zu gelangen.",
+    transfersPoints: [
+      "Persönlicher Empfang am Flughafen",
+      "Privatfahrzeug für Ihre Gruppe",
+      "Fahrpreis pro Fahrzeug",
+    ],
     transfersCta: "Transfer buchen",
-    cruisesKicker: "Flotte",
-    cruisesTitle: "Eigene Fahrzeuge und lokale Fahrer",
-    cruisesCta: "Ziele ansehen",
+    cruisesKicker: "Eigener Fuhrpark",
+    cruisesTitle: "Ihr Privatfahrzeug, Ihr Fahrer vor Ort",
+    cruisesBody:
+      "Reisen Sie in einem Fahrzeug, das ausschließlich für Sie und Ihre Mitreisenden reserviert ist. Ihr ortskundiger Fahrer bringt Sie direkt an Ihr gewünschtes Ziel auf Lanzarote.",
+    cruisesPoints: [
+      "Klimatisierte Fahrzeuge",
+      "Erfahrene Fahrer aus Lanzarote",
+      "Abholung an Hotels, Ferienvillen und Apartments",
+    ],
+    cruisesCta: "Reiseziele entdecken",
     agencyKicker: "Familienunternehmen",
     agencyTitle: "Transfer-Spezialisten",
     agencyBody:
       "Klimatisierte Kleinbusse und Privatwagen, gefahren von Einheimischen, die jede Region der Insel kennen.",
     agencyCta: "Das Unternehmen kennenlernen",
-    islandKicker: "Die Insel",
-    islandTitle: "Ihr Urlaub beginnt bei der Landung",
+    islandKicker: "Lanzarote entdecken",
+    islandTitle: "Ihr Transfer ist erst der Anfang",
     islandBody:
-      "Lanzarote ist Biosphärenreservat: Stille, Ruhe und eine einzigartige Vulkanlandschaft. Wir kümmern uns um die Fahrt, damit Sie ausgeruht im Hotel ankommen.",
-    islandCta: "Transfer buchen",
+      "Lanzarote hat weit mehr zu bieten als Sonne und Strände. Entdecken Sie die faszinierenden Vulkanlandschaften, traditionellen Dörfer und einzigartigen Kunst- und Kulturstätten von César Manrique.",
+    islandMore:
+      "Mit Lanzarote Experience Tours können Sie die Insel auf privaten Ausflügen oder in kleinen Gruppen entdecken, begleitet von offiziell zugelassenen, ortskundigen Reiseleitern.",
+    islandCta: "Ausflüge entdecken",
     reviewsKicker: "Tripadvisor",
     reviewsTitle: "Das sagen Reisende",
     reviewsSubtitle:

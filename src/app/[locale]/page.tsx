@@ -3,9 +3,14 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
   ArrowRight,
+  BookOpen,
+  Car,
   Clock3,
+  House,
+  MapPin,
   Plane,
   ShieldCheck,
+  Snowflake,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -16,18 +21,46 @@ import {
 } from "@/lib/reviews";
 import { localizeSettings } from "@/lib/localize-content";
 import { getDictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/get-locale";
 import { localePath } from "@/i18n/path";
 import { RichContent } from "@/components/RichContent";
 import { destinationCover } from "@/lib/destination-images";
-import { plainTextFromHtml } from "@/lib/sanitize-html";
 
 const ReviewsSection = dynamic(() =>
   import("@/components/ReviewsSection").then((m) => m.ReviewsSection)
 );
-const HomeIslandVideo = dynamic(() =>
-  import("@/components/HomeIslandVideo").then((m) => m.HomeIslandVideo)
-);
+
+/** Composiciones ilustrativas, no fotografías de la flota real. */
+const HOME_BANNERS = {
+  airport: "/images/home/aeropuerto-traslado.jpg",
+  fleet: "/images/home/vehiculo-privado.jpg",
+  jameos: "/images/home/jameos-del-agua.jpg",
+} as const;
+
+const EXCURSIONS_URL: Record<Locale, string> = {
+  es: "https://www.lanzaroteexperiencetours.com/es/excursiones",
+  en: "https://www.lanzaroteexperiencetours.com/en/excursions",
+  de: "https://www.lanzaroteexperiencetours.com/de/ausfluege",
+};
+
+const BANNER_ALT: Record<Locale, { airport: string; fleet: string; jameos: string }> = {
+  es: {
+    airport: "Ilustración de un viajero y un vehículo en la terminal del aeropuerto",
+    fleet: "Ilustración de un vehículo privado en el paisaje de Lanzarote",
+    jameos: "Jameos del Agua, Lanzarote",
+  },
+  en: {
+    airport: "Illustration of a traveller and a vehicle in the airport terminal",
+    fleet: "Illustration of a private vehicle in the Lanzarote landscape",
+    jameos: "Jameos del Agua, Lanzarote",
+  },
+  de: {
+    airport: "Illustration eines Reisenden und eines Fahrzeugs im Flughafenterminal",
+    fleet: "Illustration eines Privatfahrzeugs in der Landschaft von Lanzarote",
+    jameos: "Jameos del Agua, Lanzarote",
+  },
+};
 
 /** ISR: HTML/RSC cacheados; CMS se refresca ~cada 60s o al guardar. */
 export const revalidate = 60;
@@ -216,55 +249,32 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="band-dark mt-8 min-h-[380px]">
-        <Image
-          src="/images/home/traslados.jpg"
-          alt=""
-          fill
-          className="photo-vivid object-cover"
-          sizes="100vw"
-        />
-        <div className="relative z-10 mx-auto flex min-h-[380px] max-w-6xl flex-col justify-center px-4 py-16 md:px-6">
-          <p className="text-sm font-bold tracking-[0.18em] text-sky-mist uppercase">
-            {dict.home.transfersKicker}
-          </p>
-          <h2 className="text-hero-shadow mt-3 max-w-xl font-display text-4xl font-extrabold tracking-tight md:text-5xl">
-            {dict.home.transfersTitle}
-          </h2>
-          <p className="text-hero-shadow mt-4 max-w-lg text-base leading-relaxed text-white">
-            {plainTextFromHtml(settings.transferIntro)}
-          </p>
-          <Link href={lp("/traslados")} className="btn-primary mt-8 w-fit">
-            {dict.home.transfersCta}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
+      <HomeBanner
+        className="mt-8"
+        image={HOME_BANNERS.airport}
+        alt={BANNER_ALT[locale].airport}
+        objectPosition="42% center"
+        kicker={dict.home.transfersKicker}
+        title={dict.home.transfersTitle}
+        body={dict.home.transfersBody}
+        points={dict.home.transfersPoints}
+        icons={[UserRound, Car, MapPin]}
+        cta={dict.home.transfersCta}
+        href={lp("/traslados")}
+      />
 
-      <section className="band-dark band-dark-end min-h-[380px]">
-        <Image
-          src="/images/home/minibus.jpg"
-          alt=""
-          fill
-          className="photo-vivid object-cover"
-          sizes="100vw"
-        />
-        <div className="relative z-10 mx-auto flex min-h-[380px] max-w-6xl flex-col justify-center px-4 py-16 md:items-end md:px-6 md:text-right">
-          <p className="text-sm font-bold tracking-[0.18em] text-sky-mist uppercase">
-            {dict.home.cruisesKicker}
-          </p>
-          <h2 className="text-hero-shadow mt-3 max-w-xl font-display text-4xl font-extrabold tracking-tight md:text-5xl">
-            {dict.home.cruisesTitle}
-          </h2>
-          <p className="text-hero-shadow mt-4 max-w-lg text-base leading-relaxed text-white">
-            {dict.home.agencyBody}
-          </p>
-          <Link href={lp("/traslados")} className="btn-primary mt-8 w-fit">
-            {dict.home.cruisesCta}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
+      <HomeBanner
+        image={HOME_BANNERS.fleet}
+        alt={BANNER_ALT[locale].fleet}
+        objectPosition="68% center"
+        kicker={dict.home.cruisesKicker}
+        title={dict.home.cruisesTitle}
+        body={dict.home.cruisesBody}
+        points={dict.home.cruisesPoints}
+        icons={[Snowflake, BookOpen, House]}
+        cta={dict.home.cruisesCta}
+        href={lp("/traslados")}
+      />
 
       <section className="bg-gradient-to-b from-white via-sky-soft/70 to-sky-soft/40 py-20 md:py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 md:grid-cols-2 md:px-6">
@@ -310,23 +320,102 @@ export default async function HomePage({ params }: Props) {
 
       <section className="border-t border-sand-line bg-gradient-to-b from-sky-soft/70 to-white py-20 md:py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 md:grid-cols-[1.15fr_0.85fr] md:px-6">
-          <HomeIslandVideo title={dict.home.islandTitle} />
+          <div className="relative aspect-[3/2] overflow-hidden rounded-2xl shadow-xl ring-1 ring-sand-line">
+            <Image
+              src={HOME_BANNERS.jameos}
+              alt={BANNER_ALT[locale].jameos}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 640px"
+            />
+          </div>
           <div>
             <p className="section-kicker">{dict.home.islandKicker}</p>
             <h2 className="section-title mt-3">{dict.home.islandTitle}</h2>
             <p className="mt-5 text-base leading-relaxed text-ink-muted">
               {dict.home.islandBody}
             </p>
-            <Link
-              href={lp("/traslados")}
+            <p className="mt-4 text-base leading-relaxed text-ink-muted">
+              {dict.home.islandMore}
+            </p>
+            <a
+              href={EXCURSIONS_URL[locale]}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-ocean hover:text-ocean-deep"
             >
               {dict.home.islandCta}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
           </div>
         </div>
       </section>
     </>
+  );
+}
+
+function HomeBanner({
+  image,
+  alt,
+  objectPosition,
+  kicker,
+  title,
+  body,
+  points,
+  icons,
+  cta,
+  href,
+  className = "",
+}: {
+  image: string;
+  alt: string;
+  objectPosition: string;
+  kicker: string;
+  title: string;
+  body: string;
+  points: string[];
+  icons: LucideIcon[];
+  cta: string;
+  href: string;
+  className?: string;
+}) {
+  return (
+    <section className={`relative overflow-hidden text-white ${className}`}>
+      <Image
+        src={image}
+        alt={alt}
+        fill
+        className="object-cover"
+        sizes="100vw"
+        style={{ objectPosition }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#122033]/72 via-[#122033]/28 to-transparent" />
+      <div className="relative z-10 mx-auto flex min-h-[32rem] max-w-6xl flex-col justify-center px-4 py-14 md:min-h-[26rem] md:px-6">
+        <p className="text-sm font-bold tracking-[0.18em] text-sky-mist uppercase">
+          {kicker}
+        </p>
+        <h2 className="text-hero-shadow mt-3 max-w-xl font-display text-4xl font-extrabold tracking-tight md:text-5xl">
+          {title}
+        </h2>
+        <p className="text-hero-shadow mt-4 max-w-lg text-base leading-relaxed text-white">
+          {body}
+        </p>
+        <ul className="mt-6 flex max-w-3xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-6">
+          {points.map((point, index) => {
+            const Icon = icons[index] || MapPin;
+            return (
+              <li key={point} className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                <span>{point}</span>
+              </li>
+            );
+          })}
+        </ul>
+        <Link href={href} className="btn-primary mt-8 w-fit">
+          {cta}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </section>
   );
 }
