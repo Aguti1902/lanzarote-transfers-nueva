@@ -272,13 +272,13 @@ export default async function HomePage({ params }: Props) {
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 md:grid-cols-2 md:px-6">
           <div className="relative">
             <div className="absolute -inset-3 rounded-[2rem] bg-ocean/15 blur-2xl" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] shadow-[0_24px_60px_rgba(26,95,168,0.18)] ring-1 ring-white/60">
+            <div className="relative aspect-video overflow-hidden rounded-[1.75rem] shadow-[0_24px_60px_rgba(26,95,168,0.18)] ring-1 ring-white/60">
               <Image
                 src={settings.aboutImage}
-                alt="Lanzarote Transfers"
+                alt="Equipo de Lanzarote Transfers"
                 fill
-                className="photo-vivid object-cover"
-                sizes="(max-width:768px) 100vw, 50vw"
+                className="object-cover object-center"
+                sizes="(max-width:768px) 100vw, 560px"
               />
             </div>
           </div>
