@@ -119,6 +119,10 @@ export default function ContactoPage() {
         title={dict.contact.title}
         subtitle={dict.contact.subtitle}
         objectPosition={hero.objectPosition}
+        scrim="strong"
+        frameClassName={
+          hero.image.includes("mvm2xa8z-ybyd3h") ? "contact-hero-frame" : undefined
+        }
       />
 
       <section className="mx-auto grid max-w-6xl gap-12 px-4 py-14 md:grid-cols-2 md:px-6">

@@ -12,6 +12,8 @@ export function PageHero({
   eyebrow,
   compact: _compact = false,
   objectPosition = "50% 40%",
+  scrim = "soft",
+  frameClassName,
 }: {
   image: string;
   title: string;
@@ -21,8 +23,14 @@ export function PageHero({
   compact?: boolean;
   /** Encuadre CSS, p. ej. "50% 30%" (ajustable desde Admin → Ajustes). */
   objectPosition?: string;
+  /** Más contraste detrás del texto cuando la foto es clara. */
+  scrim?: "soft" | "strong";
+  /** Clase con object-position responsive. Si se pasa, ignora objectPosition. */
+  frameClassName?: string;
 }) {
   void _compact;
+  const titleWidth = scrim === "strong" ? "max-w-xl" : "max-w-3xl";
+  const subtitleWidth = scrim === "strong" ? "max-w-md" : "max-w-2xl";
   return (
     <section
       className={`relative overflow-hidden bg-[#2a3344] text-white ${HERO_MIN}`}
@@ -32,12 +40,24 @@ export function PageHero({
         alt=""
         fill
         priority
-        className="hero-still object-cover"
+        className={`hero-still object-cover ${frameClassName || ""}`}
         sizes="100vw"
-        style={{ objectPosition }}
+        style={frameClassName ? undefined : { objectPosition }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/28 via-black/8 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/5" />
+      <div
+        className={
+          scrim === "strong"
+            ? "absolute inset-0 bg-gradient-to-r from-black/55 via-black/18 to-transparent"
+            : "absolute inset-0 bg-gradient-to-r from-black/28 via-black/8 to-transparent"
+        }
+      />
+      <div
+        className={
+          scrim === "strong"
+            ? "absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent"
+            : "absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/5"
+        }
+      />
       <div
         className={`relative mx-auto flex max-w-6xl flex-col justify-end px-4 md:px-6 ${HERO_PAD}`}
       >
@@ -46,11 +66,17 @@ export function PageHero({
             {eyebrow}
           </p>
         )}
-        <h1 className="animate-fade-up-delay text-hero-shadow max-w-3xl font-display text-4xl font-extrabold tracking-tight md:text-6xl">
+        <h1
+          className={`animate-fade-up-delay text-hero-shadow ${titleWidth} font-display font-extrabold tracking-tight ${
+            scrim === "strong" ? "text-3xl md:text-5xl" : "text-4xl md:text-6xl"
+          }`}
+        >
           {title}
         </h1>
         {plainTextFromHtml(subtitle || "") && (
-          <p className="animate-fade-up-delay-2 text-hero-shadow mt-4 max-w-2xl text-base leading-relaxed text-white md:text-lg">
+          <p
+            className={`animate-fade-up-delay-2 text-hero-shadow mt-4 ${subtitleWidth} text-base leading-relaxed text-white md:text-lg`}
+          >
             {plainTextFromHtml(subtitle || "")}
           </p>
         )}

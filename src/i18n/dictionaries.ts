@@ -809,8 +809,8 @@ const es: Dictionary = {
     size: "m²",
   },
   contact: {
-    title: "¿Cómo podemos ayudarle?",
-    subtitle: "Estamos para resolver todas sus dudas. Contacto 24 / 7.",
+    title: "¿Necesitas ayuda con tu traslado?",
+    subtitle: "Estamos aquí para ayudarte a organizar tu transporte en Lanzarote.",
     formTitle: "Formulario de contacto",
     infoTitle: "Información de contacto",
     name: "Nombre",
@@ -1383,8 +1383,8 @@ const en: Dictionary = {
     size: "m²",
   },
   contact: {
-    title: "How can we help you?",
-    subtitle: "We are here to answer all your questions. Contact 24 / 7.",
+    title: "Need help with your transfer?",
+    subtitle: "We're here to help you arrange your transport in Lanzarote.",
     formTitle: "Contact form",
     infoTitle: "Contact information",
     name: "Name",
@@ -1958,8 +1958,8 @@ const de: Dictionary = {
     size: "m²",
   },
   contact: {
-    title: "Wie können wir helfen?",
-    subtitle: "Wir beantworten gerne alle Fragen. Kontakt 24 / 7.",
+    title: "Benötigen Sie Hilfe bei Ihrem Transfer?",
+    subtitle: "Wir helfen Ihnen gerne bei der Organisation Ihres Transfers auf Lanzarote.",
     formTitle: "Kontaktformular",
     infoTitle: "Kontaktinformationen",
     name: "Name",
@@ -2255,16 +2255,32 @@ const LEGACY_ABOUT_COPY: Record<string, string> = {
     de.about.visionText,
 };
 
+const LEGACY_CONTACT_COPY: Record<string, string> = {
+  "¿Cómo podemos ayudarle?": es.contact.title,
+  "Estamos para resolver todas sus dudas. Contacto 24 / 7.": es.contact.subtitle,
+  "How can we help you?": en.contact.title,
+  "We are here to answer all your questions. Contact 24 / 7.": en.contact.subtitle,
+  "Wie können wir helfen?": de.contact.title,
+  "Wir beantworten gerne alle Fragen. Kontakt 24 / 7.": de.contact.subtitle,
+};
+
 function refreshAboutCopy(dict: Dictionary): Dictionary {
   const missionText = LEGACY_ABOUT_COPY[dict.about.missionText];
   const visionText = LEGACY_ABOUT_COPY[dict.about.visionText];
-  if (!missionText && !visionText) return dict;
+  const contactTitle = LEGACY_CONTACT_COPY[dict.contact.title];
+  const contactSubtitle = LEGACY_CONTACT_COPY[dict.contact.subtitle];
+  if (!missionText && !visionText && !contactTitle && !contactSubtitle) return dict;
   return {
     ...dict,
     about: {
       ...dict.about,
       ...(missionText ? { missionText } : {}),
       ...(visionText ? { visionText } : {}),
+    },
+    contact: {
+      ...dict.contact,
+      ...(contactTitle ? { title: contactTitle } : {}),
+      ...(contactSubtitle ? { subtitle: contactSubtitle } : {}),
     },
   };
 }
