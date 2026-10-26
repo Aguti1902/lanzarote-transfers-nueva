@@ -191,6 +191,19 @@ export function stripHtml(raw: string): string {
     .trim();
 }
 
+/** Texto plano para títulos y subtítulos, aunque el panel haya pegado HTML. */
+export function plainTextFromHtml(raw: string): string {
+  return stripHtml(raw)
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /** Clases Tailwind comunes para HTML tipográfico sanitizado. */
 export const RICH_CONTENT_CLASS =
   "rich-content space-y-3 leading-relaxed text-ink-muted [&_b]:font-bold [&_b]:text-ink [&_strong]:font-bold [&_strong]:text-ink [&_u]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-ink [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-ink [&_img]:my-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-lg";

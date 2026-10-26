@@ -462,7 +462,15 @@ export async function localizeTransfers(
       const description = destCopy[dest.id]?.description?.trim();
       return description ? { ...dest, description } : dest;
     }),
-    ...(highlights?.length ? { highlights } : {}),
+    ...(highlights?.length
+      ? {
+          highlights: highlights.map((item) =>
+            item.trim() === "Live flight tracking & automated pickup adjustment"
+              ? "Flight monitoring to help coordinate your airport pick-up"
+              : item
+          ),
+        }
+      : {}),
   };
 }
 

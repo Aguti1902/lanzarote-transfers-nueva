@@ -20,6 +20,7 @@ import { resolveLocale } from "@/i18n/get-locale";
 import { localePath } from "@/i18n/path";
 import { RichContent } from "@/components/RichContent";
 import { destinationCover } from "@/lib/destination-images";
+import { plainTextFromHtml } from "@/lib/sanitize-html";
 
 const ReviewsSection = dynamic(() =>
   import("@/components/ReviewsSection").then((m) => m.ReviewsSection)
@@ -231,7 +232,7 @@ export default async function HomePage({ params }: Props) {
             {dict.home.transfersTitle}
           </h2>
           <p className="text-hero-shadow mt-4 max-w-lg text-base leading-relaxed text-white">
-            {settings.transferIntro}
+            {plainTextFromHtml(settings.transferIntro)}
           </p>
           <Link href={lp("/traslados")} className="btn-primary mt-8 w-fit">
             {dict.home.transfersCta}

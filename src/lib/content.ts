@@ -251,6 +251,17 @@ export async function deleteTour(id: string): Promise<boolean> {
 
 /* ── Transfers ── */
 
+const HIGHLIGHT_COPY: Record<string, string> = {
+  "Monitoreo de vuelos en tiempo real y adaptación de la recogida":
+    "Seguimiento de vuelos para coordinar la recogida",
+  "Live flight tracking & automated pickup adjustment":
+    "Flight monitoring to help coordinate your airport pick-up",
+};
+
+function applyHighlightCopy(highlights: string[] | undefined): string[] {
+  return (highlights || []).map((item) => HIGHLIGHT_COPY[item.trim()] || item);
+}
+
 /** Textos antiguos del CMS en vivo antes del copy actualizado. */
 function transfersHighlightsLookLegacy(highlights: string[] | undefined): boolean {
   if (!highlights?.length) return true;
@@ -281,7 +292,8 @@ async function withTransferHighlightSeed(
 export const getTransfersData = cache(async (): Promise<TransfersData> => {
   const fromDb = await dbGetTransfers();
   const data = fromDb ?? (await readJson<TransfersData>("transfers.json"));
-  return withTransferHighlightSeed(data);
+  const seeded = await withTransferHighlightSeed(data);
+  return { ...seeded, highlights: applyHighlightCopy(seeded.highlights) };
 });
 
 export async function getTransferDestinations(): Promise<TransferDestination[]> {
