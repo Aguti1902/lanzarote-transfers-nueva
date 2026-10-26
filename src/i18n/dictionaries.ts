@@ -59,10 +59,8 @@ export type Dictionary = {
     agencyTitle: string;
     agencyBody: string;
     agencyCta: string;
-    islandKicker: string;
     islandTitle: string;
     islandBody: string;
-    islandMore: string;
     islandCta: string;
     reviewsKicker: string;
     reviewsTitle: string;
@@ -528,13 +526,10 @@ const es: Dictionary = {
     agencyBody:
       "Minibuses y vehículos privados climatizados, con chóferes que conocen cada zona de la isla.",
     agencyCta: "Conocer la empresa",
-    islandKicker: "Descubre Lanzarote",
-    islandTitle: "Tu traslado es solo el comienzo",
+    islandTitle: "Descubre Lanzarote con nosotros",
     islandBody:
-      "Lanzarote es mucho más que sol y playas. Descubre sus paisajes volcánicos, sus pueblos tradicionales y los espacios únicos creados por César Manrique.",
-    islandMore:
-      "Con Lanzarote Experience Tours puedes explorar la isla en excursiones privadas o en grupos pequeños, acompañados por guías oficiales locales.",
-    islandCta: "Descubrir excursiones",
+      "Desde tu llegada al aeropuerto hasta tus recorridos por la isla, en Lanzarote Transfers ofrecemos transporte privado con conductor, minibuses y autocares para grupos. Viaja cómodamente y descubre Lanzarote a tu ritmo.",
+    islandCta: "Descubre nuestros servicios",
     reviewsKicker: "Tripadvisor",
     reviewsTitle: "Lo que dicen los viajeros",
     reviewsSubtitle:
@@ -1147,13 +1142,10 @@ const en: Dictionary = {
     agencyBody:
       "Air-conditioned minibuses and private cars, driven by locals who know every area of the island.",
     agencyCta: "Meet the company",
-    islandKicker: "Discover Lanzarote",
-    islandTitle: "Your transfer is just the beginning",
+    islandTitle: "Discover Lanzarote with Us",
     islandBody:
-      "Lanzarote has so much more to offer than sunshine and beaches. Discover its volcanic landscapes, traditional villages and the remarkable spaces created by César Manrique.",
-    islandMore:
-      "With Lanzarote Experience Tours, you can explore the island on private or small-group excursions, accompanied by official local guides.",
-    islandCta: "Explore our tours",
+      "From your arrival at the airport to exploring the island, Lanzarote Transfers offers private transport with professional drivers, minibuses and coaches for groups. Travel comfortably and discover Lanzarote at your own pace.",
+    islandCta: "Explore Our Services",
     reviewsKicker: "Tripadvisor",
     reviewsTitle: "What travellers say",
     reviewsSubtitle:
@@ -1718,13 +1710,10 @@ const de: Dictionary = {
     agencyBody:
       "Klimatisierte Kleinbusse und Privatwagen, gefahren von Einheimischen, die jede Region der Insel kennen.",
     agencyCta: "Das Unternehmen kennenlernen",
-    islandKicker: "Lanzarote entdecken",
-    islandTitle: "Ihr Transfer ist erst der Anfang",
+    islandTitle: "Entdecken Sie Lanzarote mit uns",
     islandBody:
-      "Lanzarote hat weit mehr zu bieten als Sonne und Strände. Entdecken Sie die faszinierenden Vulkanlandschaften, traditionellen Dörfer und einzigartigen Kunst- und Kulturstätten von César Manrique.",
-    islandMore:
-      "Mit Lanzarote Experience Tours können Sie die Insel auf privaten Ausflügen oder in kleinen Gruppen entdecken, begleitet von offiziell zugelassenen, ortskundigen Reiseleitern.",
-    islandCta: "Ausflüge entdecken",
+      "Von Ihrer Ankunft am Flughafen bis zu Ihren Fahrten über die Insel bietet Lanzarote Transfers private Fahrdienste mit professionellen Fahrern, Kleinbussen und Reisebussen für Gruppen. Reisen Sie bequem und entdecken Sie Lanzarote in Ihrem eigenen Tempo.",
+    islandCta: "Entdecken Sie unsere Dienstleistungen",
     reviewsKicker: "Tripadvisor",
     reviewsTitle: "Das sagen Reisende",
     reviewsSubtitle:

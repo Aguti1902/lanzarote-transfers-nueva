@@ -26,6 +26,8 @@ import { resolveLocale } from "@/i18n/get-locale";
 import { localePath } from "@/i18n/path";
 import { RichContent } from "@/components/RichContent";
 import { destinationCover } from "@/lib/destination-images";
+import { HomePromoVideo, HOME_PROMO_VIDEO } from "@/components/HomePromoVideo";
+import { resolvePublicOrigin } from "@/lib/voucher";
 
 const ReviewsSection = dynamic(() =>
   import("@/components/ReviewsSection").then((m) => m.ReviewsSection)
@@ -35,30 +37,20 @@ const ReviewsSection = dynamic(() =>
 const HOME_BANNERS = {
   airport: "/images/home/aeropuerto-traslado.jpg",
   fleet: "/images/home/vehiculo-privado.jpg",
-  jameos: "/images/home/jameos-del-agua.jpg",
 } as const;
 
-const EXCURSIONS_URL: Record<Locale, string> = {
-  es: "https://www.lanzaroteexperiencetours.com/es/excursiones",
-  en: "https://www.lanzaroteexperiencetours.com/en/excursions",
-  de: "https://www.lanzaroteexperiencetours.com/de/ausfluege",
-};
-
-const BANNER_ALT: Record<Locale, { airport: string; fleet: string; jameos: string }> = {
+const BANNER_ALT: Record<Locale, { airport: string; fleet: string }> = {
   es: {
     airport: "Ilustración de un viajero y un vehículo en la terminal del aeropuerto",
     fleet: "Ilustración de un vehículo privado en el paisaje de Lanzarote",
-    jameos: "Jameos del Agua, Lanzarote",
   },
   en: {
     airport: "Illustration of a traveller and a vehicle in the airport terminal",
     fleet: "Illustration of a private vehicle in the Lanzarote landscape",
-    jameos: "Jameos del Agua, Lanzarote",
   },
   de: {
     airport: "Illustration eines Reisenden und eines Fahrzeugs im Flughafenterminal",
     fleet: "Illustration eines Privatfahrzeugs in der Landschaft von Lanzarote",
-    jameos: "Jameos del Agua, Lanzarote",
   },
 };
 
@@ -320,35 +312,32 @@ export default async function HomePage({ params }: Props) {
 
       <section className="border-t border-sand-line bg-gradient-to-b from-sky-soft/70 to-white py-20 md:py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 md:grid-cols-[1.15fr_0.85fr] md:px-6">
-          <div className="relative aspect-[3/2] overflow-hidden rounded-2xl shadow-xl ring-1 ring-sand-line">
-            <Image
-              src={HOME_BANNERS.jameos}
-              alt={BANNER_ALT[locale].jameos}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 640px"
-            />
-          </div>
+          <HomePromoVideo />
           <div>
-            <p className="section-kicker">{dict.home.islandKicker}</p>
-            <h2 className="section-title mt-3">{dict.home.islandTitle}</h2>
+            <h2 className="section-title">{dict.home.islandTitle}</h2>
             <p className="mt-5 text-base leading-relaxed text-ink-muted">
               {dict.home.islandBody}
             </p>
-            <p className="mt-4 text-base leading-relaxed text-ink-muted">
-              {dict.home.islandMore}
-            </p>
-            <a
-              href={EXCURSIONS_URL[locale]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-ocean hover:text-ocean-deep"
-            >
+            <Link href={lp("/traslados")} className="btn-primary mt-8">
               {dict.home.islandCta}
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              name: HOME_PROMO_VIDEO.title,
+              description: dict.home.islandBody,
+              thumbnailUrl: `${resolvePublicOrigin()}${HOME_PROMO_VIDEO.poster}`,
+              contentUrl: `${resolvePublicOrigin()}${HOME_PROMO_VIDEO.src}`,
+              uploadDate: "2026-10-26",
+            }),
+          }}
+        />
       </section>
     </>
   );
