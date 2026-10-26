@@ -22,7 +22,7 @@ const ADDRESS =
 const CIF = "B76071836";
 const LICENSE = "I-AV-0002407.1";
 const EMAIL = "info@lanzaroteexperiencetours.com";
-const SUPPORT = "support@lanzaroteexperiencetours.com";
+const SUPPORT = "reservas@lanzarotetransfers.es";
 const PHONE = "+34 646 08 05 85";
 
 const es: LegalBundle = {

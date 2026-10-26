@@ -33,6 +33,7 @@ import {
   dbSaveTransfers,
 } from "@/lib/supabase/postgres";
 import { tourMatchesSlug } from "@/i18n/tour-slugs";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/mail-routing";
 import { revalidateSite } from "@/lib/revalidate-site";
 import { SETTINGS_STRING_KEYS } from "@/lib/settings-i18n";
 import {
@@ -507,7 +508,7 @@ const defaultSettings: SiteSettings = {
   brandName: "Lanzarote Transfers",
   tagline: "Traslados privados aeropuerto ↔ hotel",
   phone: "+34 646 08 05 85",
-  email: "support@lanzaroteexperiencetours.com",
+  email: "reservas@lanzarotetransfers.es",
   hours: "Contacto 24 / 7",
   homeHeadline: "Lanzarote Transfers",
   homeSubheadline: "Traslados privados aeropuerto ↔ hotel",
@@ -614,7 +615,17 @@ function scrubSettingsHtml(settings: SiteSettings): SiteSettings {
       (next as Record<string, unknown>)[key] = pastedWebHtmlToCleanHtml(value);
     }
   }
-  return next;
+  return withPublicContactEmail(next);
+}
+
+const LEGACY_PUBLIC_EMAIL = "support@lanzaroteexperiencetours.com";
+
+function withPublicContactEmail(settings: SiteSettings): SiteSettings {
+  const email = settings.email?.trim().toLowerCase();
+  if (!email || email === LEGACY_PUBLIC_EMAIL) {
+    return { ...settings, email: PUBLIC_CONTACT_EMAIL };
+  }
+  return settings;
 }
 
 export const getSettings = cache(async (): Promise<SiteSettings> => {

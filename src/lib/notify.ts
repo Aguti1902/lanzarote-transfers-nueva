@@ -9,7 +9,11 @@ import {
   emailRow,
 } from "@/lib/email-layout";
 import { escapeHtml, formatFromAddress, sendEmail } from "@/lib/mail";
-import { MAILBOX, resolveBookingMailbox } from "@/lib/mail-routing";
+import {
+  MAILBOX,
+  PUBLIC_CONTACT_EMAIL,
+  resolveBookingMailbox,
+} from "@/lib/mail-routing";
 import { resolvePublicOrigin } from "@/lib/voucher";
 
 const ADMIN_FOOTER = "Notificación interna · Lanzarote Transfers.";
@@ -53,7 +57,7 @@ export async function notifyContactMessage(input: {
   `;
 
   return sendEmail({
-    to: MAILBOX.support,
+    to: [PUBLIC_CONTACT_EMAIL, MAILBOX.support],
     from: formatFromAddress(MAILBOX.support),
     subject: `[Contacto web] ${input.name}`,
     text,

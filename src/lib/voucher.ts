@@ -146,7 +146,7 @@ export function buildVoucherHtml(
     taxId: "B00000000",
     address: "Calle Calderetas, 100, 35550 San Bartolomé - Lanzarote",
     phone: "+34 646 08 05 85",
-    email: "support@lanzaroteexperiencetours.com",
+    email: "reservas@lanzarotetransfers.es",
     ...options?.company,
   };
 

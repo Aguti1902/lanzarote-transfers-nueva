@@ -2,9 +2,13 @@
  * Destinatarios / remitentes operativos.
  * - Bajo petición → info@
  * - Reservas / traslados → booking@
- * - Contacto web → support@
+ * - Aviso interno del formulario → support@ (dominio verificado en el envío)
+ * - Correo público de Lanzarote Transfers → reservas@
  * - Cruceristas → cruise@
  */
+
+/** Correo que ve el cliente y destino de los mensajes del formulario. */
+export const PUBLIC_CONTACT_EMAIL = "reservas@lanzarotetransfers.es";
 
 export const MAILBOX = {
   info: "info@lanzaroteexperiencetours.com",

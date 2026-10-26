@@ -19,7 +19,11 @@ import {
   EMAIL_BRAND,
 } from "@/lib/email-layout";
 import { escapeHtml, formatFromAddress, sendEmail, type SendEmailResult } from "@/lib/mail";
-import { MAILBOX, resolveBookingMailbox } from "@/lib/mail-routing";
+import {
+  MAILBOX,
+  PUBLIC_CONTACT_EMAIL,
+  resolveBookingMailbox,
+} from "@/lib/mail-routing";
 import { isOnlineCardMethod } from "@/lib/payments";
 import { resolvePublicOrigin } from "@/lib/voucher";
 import { localePath } from "@/i18n/path";
@@ -561,9 +565,9 @@ export async function sendContactAutoReply(input: {
     de: "Wir haben Ihre Nachricht erhalten · Lanzarote Transfers",
   };
   const bodies = {
-    es: `Hola ${input.name},\n\nGracias por escribirnos. Hemos recibido su mensaje y le responderemos lo antes posible.\n\nLanzarote Transfers\n+34 646 08 05 85`,
-    en: `Hello ${input.name},\n\nThank you for contacting us. We have received your message and will reply as soon as possible.\n\nLanzarote Transfers\n+34 646 08 05 85`,
-    de: `Hallo ${input.name},\n\nVielen Dank für Ihre Nachricht. Wir melden uns so schnell wie möglich.\n\nLanzarote Transfers\n+34 646 08 05 85`,
+    es: `Hola ${input.name},\n\nGracias por escribirnos. Hemos recibido su mensaje y le responderemos lo antes posible.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
+    en: `Hello ${input.name},\n\nThank you for contacting us. We have received your message and will reply as soon as possible.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
+    de: `Hallo ${input.name},\n\nVielen Dank für Ihre Nachricht. Wir melden uns so schnell wie möglich.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
   };
   const text = bodies[locale];
   return sendEmail({
@@ -579,6 +583,6 @@ export async function sendContactAutoReply(input: {
       brand: COPY[locale].brand,
       lang: locale,
     }),
-    replyTo: MAILBOX.support,
+    replyTo: PUBLIC_CONTACT_EMAIL,
   });
 }

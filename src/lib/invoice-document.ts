@@ -19,7 +19,7 @@ const DEFAULT_COMPANY: InvoiceCompany = {
   agencyLicense: "I-AV-0002407.1",
   address: "Calle Calderetas, 100, 35550 San Bartolomé - Lanzarote",
   phone: "+34 646 08 05 85",
-  email: "support@lanzaroteexperiencetours.com",
+  email: "reservas@lanzarotetransfers.es",
 };
 
 export function companyFromSettings(

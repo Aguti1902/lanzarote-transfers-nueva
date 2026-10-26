@@ -6,6 +6,7 @@ import { Mail, Phone } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { useCookieConsent } from "@/components/CookieBanner";
 import { useLocale } from "@/components/LocaleProvider";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/mail-routing";
 
 export function Footer() {
   const pathname = usePathname();
@@ -86,13 +87,13 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:support@lanzaroteexperiencetours.com"
+                  href={`mailto:${PUBLIC_CONTACT_EMAIL}`}
                   className="inline-flex items-center gap-2 transition hover:text-white"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ocean/20">
                     <Mail className="h-3.5 w-3.5 text-sky-mist" />
                   </span>
-                  support@lanzaroteexperiencetours.com
+                  {PUBLIC_CONTACT_EMAIL}
                 </a>
               </li>
             </ul>

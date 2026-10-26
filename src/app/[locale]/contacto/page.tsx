@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/mail-routing";
 import { PageContentBlocks } from "@/components/PageContentBlocks";
 import { PageFaqs } from "@/components/PageFaqs";
 import { PageHero } from "@/components/PageHero";
@@ -194,20 +195,13 @@ export default function ContactoPage() {
             <li className="flex items-start gap-3">
               <Mail className="mt-0.5 h-4 w-4 text-ocean" />
               <a
-                href="mailto:support@lanzaroteexperiencetours.com"
+                href={`mailto:${PUBLIC_CONTACT_EMAIL}`}
                 className="hover:text-ocean"
               >
-                support@lanzaroteexperiencetours.com
+                {PUBLIC_CONTACT_EMAIL}
               </a>
             </li>
-            <li className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 text-ocean" />
-              <span className="whitespace-pre-line">{dict.contact.address}</span>
-            </li>
           </ul>
-          <p className="mt-6 text-sm text-ink-muted">
-            Agencia Nº: I-AV-0002407.1
-          </p>
         </div>
       </section>
 
