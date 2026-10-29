@@ -82,7 +82,7 @@ function localReply(message: string, knowledge: string): string {
 
   if (/contacto|telefono|llamar|email|correo|whatsapp|horario/.test(q)) {
     const phone = knowledge.match(/Teléfono: (.+)/)?.[1] || "+34 646 08 05 85";
-    const email = knowledge.match(/Email: (.+)/)?.[1] || "reservas@lanzarotetransfers.es";
+    const email = knowledge.match(/Email: (.+)/)?.[1] || "info@lanzarotetransfers.es";
     const hours = knowledge.match(/Horario: (.+)/)?.[1] || "Contacto 24 / 7";
     return `Puedes contactarnos en ${phone} o ${email}. Horario: ${hours}. También puedes reservar online desde /traslados.`;
   }

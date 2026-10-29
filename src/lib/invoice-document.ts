@@ -1,6 +1,7 @@
 import type { Invoice, SiteSettings } from "@/types";
 import { BRAND_LOGO_DATA_URI } from "@/lib/brand-logo-data";
 import { formatDateShort } from "@/lib/format";
+import { BOOKING_EMAIL } from "@/lib/mail-routing";
 
 export type InvoiceCompany = {
   brandName: string;
@@ -32,7 +33,7 @@ export function companyFromSettings(
     taxId: settings?.companyTaxId?.trim() || DEFAULT_COMPANY.taxId,
     address: settings?.companyAddress?.trim() || DEFAULT_COMPANY.address,
     phone: settings?.phone?.trim() || DEFAULT_COMPANY.phone,
-    email: settings?.email?.trim() || DEFAULT_COMPANY.email,
+    email: BOOKING_EMAIL,
     brandName: settings?.brandName?.trim() || DEFAULT_COMPANY.brandName,
   };
 }

@@ -508,7 +508,7 @@ const defaultSettings: SiteSettings = {
   brandName: "Lanzarote Transfers",
   tagline: "Traslados privados aeropuerto ↔ hotel",
   phone: "+34 646 08 05 85",
-  email: "reservas@lanzarotetransfers.es",
+  email: "info@lanzarotetransfers.es",
   hours: "Contacto 24 / 7",
   homeHeadline: "Lanzarote Transfers",
   homeSubheadline: "Traslados privados aeropuerto ↔ hotel",
@@ -618,11 +618,15 @@ function scrubSettingsHtml(settings: SiteSettings): SiteSettings {
   return withPublicContactEmail(next);
 }
 
-const LEGACY_PUBLIC_EMAIL = "support@lanzaroteexperiencetours.com";
+const LEGACY_PUBLIC_EMAILS = new Set([
+  "support@lanzaroteexperiencetours.com",
+  "info@lanzaroteexperiencetours.com",
+  "reservas@lanzarotetransfers.es",
+]);
 
 function withPublicContactEmail(settings: SiteSettings): SiteSettings {
   const email = settings.email?.trim().toLowerCase();
-  if (!email || email === LEGACY_PUBLIC_EMAIL) {
+  if (!email || LEGACY_PUBLIC_EMAILS.has(email)) {
     return { ...settings, email: PUBLIC_CONTACT_EMAIL };
   }
   return settings;

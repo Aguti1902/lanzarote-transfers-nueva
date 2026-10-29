@@ -1,20 +1,21 @@
 /**
- * Destinatarios / remitentes operativos.
- * - Bajo petición → info@
- * - Reservas / traslados → booking@
- * - Aviso interno del formulario → support@ (dominio verificado en el envío)
- * - Correo público de Lanzarote Transfers → reservas@
- * - Cruceristas → cruise@
+ * Destinatarios de Lanzarote Transfers.
+ * - Reservas, cancelaciones y respuestas de una reserva → reservas@
+ * - Formulario y contacto público → info@
+ *
+ * El envío sale desde un buzón ya verificado. reservas@ e info@
+ * solo reciben; si se usan como remitente, el correo se rechaza.
  */
 
-/** Correo que ve el cliente y destino de los mensajes del formulario. */
-export const PUBLIC_CONTACT_EMAIL = "reservas@lanzarotetransfers.es";
+export const BOOKING_EMAIL = "reservas@lanzarotetransfers.es";
+export const PUBLIC_CONTACT_EMAIL = "info@lanzarotetransfers.es";
+export const VERIFIED_FROM_EMAIL = "booking@lanzaroteexperiencetours.com";
 
 export const MAILBOX = {
-  info: "info@lanzaroteexperiencetours.com",
-  booking: "booking@lanzaroteexperiencetours.com",
-  support: "support@lanzaroteexperiencetours.com",
-  cruise: "cruise@lanzaroteexperiencetours.com",
+  info: PUBLIC_CONTACT_EMAIL,
+  booking: BOOKING_EMAIL,
+  support: PUBLIC_CONTACT_EMAIL,
+  cruise: BOOKING_EMAIL,
 } as const;
 
 export type BookingNotifyKind =
@@ -23,45 +24,20 @@ export type BookingNotifyKind =
   | "transfer"
   | "cruise";
 
-export function resolveBookingMailbox(input: {
+/** Todas las reservas de esta web llegan al mismo buzón. */
+export function resolveBookingMailbox(_input?: {
   type?: string;
   bookingMethod?: string;
   tourId?: string;
   groupId?: string;
   cruiseShip?: string;
   source?: string;
-  /** Prefijo de id (CR-…) por si no hay tourId de shore */
   bookingId?: string;
 }): string {
-  const method = String(input.bookingMethod || "").toLowerCase();
-  const source = String(input.source || "").toLowerCase();
-  const tourId = String(input.tourId || "");
-  const bookingId = String(input.bookingId || "");
-  const cruiseShip = String(input.cruiseShip || "").trim();
-  const groupId = String(input.groupId || "").trim();
-
-  // Excursión bajo petición / solicitar reserva
-  if (method === "request" || method === "phone") {
-    return MAILBOX.info;
-  }
-
-  // Cruceristas / shore / grupo de crucero
-  if (
-    source === "cruise" ||
-    cruiseShip ||
-    groupId ||
-    tourId.startsWith("shore-") ||
-    /^CR/i.test(tourId) ||
-    /^CR[-_]?\d/i.test(bookingId)
-  ) {
-    return MAILBOX.cruise;
-  }
-
-  // Excursiones y traslados
-  return MAILBOX.booking;
+  return BOOKING_EMAIL;
 }
 
-/** ¿Es un correo de crucero (shore / grupo / barco)? */
+/** El buzón de cruceros ya no es distinto del de reservas. */
 export function isCruiseMailbox(mailbox: string) {
-  return mailbox === MAILBOX.cruise;
+  return mailbox === "cruise@lanzaroteexperiencetours.com";
 }

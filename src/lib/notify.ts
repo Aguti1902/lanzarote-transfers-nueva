@@ -10,8 +10,8 @@ import {
 } from "@/lib/email-layout";
 import { escapeHtml, formatFromAddress, sendEmail } from "@/lib/mail";
 import {
-  MAILBOX,
   PUBLIC_CONTACT_EMAIL,
+  VERIFIED_FROM_EMAIL,
   resolveBookingMailbox,
 } from "@/lib/mail-routing";
 import { resolvePublicOrigin } from "@/lib/voucher";
@@ -57,8 +57,8 @@ export async function notifyContactMessage(input: {
   `;
 
   return sendEmail({
-    to: [PUBLIC_CONTACT_EMAIL, MAILBOX.support],
-    from: formatFromAddress(MAILBOX.support),
+    to: PUBLIC_CONTACT_EMAIL,
+    from: formatFromAddress(VERIFIED_FROM_EMAIL),
     subject: `[Contacto web] ${input.name}`,
     text,
     html: emailLayout({
@@ -82,20 +82,19 @@ export async function notifyNewBooking(
   booking: Booking,
   meta?: { bookingMethod?: string; source?: string }
 ) {
-  const to = resolveBookingMailbox({
-    type: booking.type,
-    bookingMethod: meta?.bookingMethod,
-    tourId: booking.tourId,
-    groupId: booking.groupId,
-    cruiseShip: booking.customer?.cruiseShip,
-    source: meta?.source,
-    bookingId: booking.id,
-  });
+  const to = resolveBookingMailbox();
 
+  const method = String(meta?.bookingMethod || "").toLowerCase();
+  const cruise =
+    Boolean(booking.customer?.cruiseShip?.trim()) ||
+    Boolean(booking.groupId?.trim()) ||
+    String(booking.tourId || "").startsWith("shore-") ||
+    /^CR/i.test(String(booking.tourId || "")) ||
+    /^CR[-_]?\d/i.test(booking.id);
   const kindLabel =
-    to === MAILBOX.info
+    method === "request" || method === "phone"
       ? "Solicitud bajo petición"
-      : to === MAILBOX.cruise
+      : cruise
         ? "Reserva crucerista"
         : booking.type === "transfer"
           ? "Reserva de traslado"
@@ -201,7 +200,7 @@ export async function notifyNewBooking(
 
   return sendEmail({
     to,
-    from: formatFromAddress(to),
+    from: formatFromAddress(VERIFIED_FROM_EMAIL),
     subject: `[${kindLabel}] ${booking.id} · ${booking.tourTitle}`,
     text,
     html: emailLayout({

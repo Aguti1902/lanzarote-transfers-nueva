@@ -5,6 +5,7 @@ import { getSettings } from "@/lib/content";
 import { buildVoucherHtml } from "@/lib/voucher";
 import { resolveLocale } from "@/i18n/get-locale";
 import { localePath } from "@/i18n/path";
+import { BOOKING_EMAIL } from "@/lib/mail-routing";
 import { getDictionary } from "@/i18n/dictionaries";
 
 export const metadata: Metadata = {
@@ -53,7 +54,7 @@ export default async function VoucherPage({ params, searchParams }: Props) {
       taxId: settings.companyTaxId || "—",
       address: settings.companyAddress || "",
       phone: settings.phone,
-      email: settings.email,
+      email: BOOKING_EMAIL,
     },
     labels: {
       title: dict.voucher.title,

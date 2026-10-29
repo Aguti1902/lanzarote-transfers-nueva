@@ -20,8 +20,9 @@ import {
 } from "@/lib/email-layout";
 import { escapeHtml, formatFromAddress, sendEmail, type SendEmailResult } from "@/lib/mail";
 import {
-  MAILBOX,
+  BOOKING_EMAIL,
   PUBLIC_CONTACT_EMAIL,
+  VERIFIED_FROM_EMAIL,
   resolveBookingMailbox,
 } from "@/lib/mail-routing";
 import { isOnlineCardMethod } from "@/lib/payments";
@@ -97,7 +98,7 @@ const COPY = {
       "Este mensaje va dirigido, de manera exclusiva, a su destinatario y puede contener información confidencial y sujeta al secreto profesional, cuya divulgación no está permitida por Ley.",
       "En caso de haber recibido este mensaje por error, le rogamos que de forma inmediata, nos lo comunique mediante correo electrónico remitido a nuestra atención y proceda a su eliminación, así como a la de cualquier documento adjunto al mismo.",
       "Asimismo, le comunicamos que la distribución, copia o utilización de este mensaje, o de cualquier documento adjunto al mismo, cualquiera que fuera su finalidad, están prohibidas por la ley.",
-      "En aras del cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016, puede ejercer los derechos de acceso, rectificación, cancelación, limitación, oposición y portabilidad de manera gratuita mediante correo electrónico a: info@lanzaroteexperiencetours.com o bien en la siguiente dirección: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
+      "En aras del cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016, puede ejercer los derechos de acceso, rectificación, cancelación, limitación, oposición y portabilidad de manera gratuita mediante correo electrónico a: info@lanzarotetransfers.es o bien en la siguiente dirección: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
     ],
   },
   en: {
@@ -154,7 +155,7 @@ const COPY = {
       "This message is intended exclusively for its recipient and may contain confidential information subject to professional secrecy, the disclosure of which is not permitted by law.",
       "If you have received this message in error, please notify us immediately by email and delete it, as well as any attached documents.",
       "Likewise, the distribution, copying or use of this message, or of any document attached to it, for any purpose whatsoever, is prohibited by law.",
-      "In accordance with Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016, you may exercise your rights of access, rectification, erasure, restriction, objection and portability free of charge by email to: info@lanzaroteexperiencetours.com or at the following address: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
+      "In accordance with Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016, you may exercise your rights of access, rectification, erasure, restriction, objection and portability free of charge by email to: info@lanzarotetransfers.es or at the following address: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
     ],
   },
   de: {
@@ -211,7 +212,7 @@ const COPY = {
       "Diese Nachricht ist ausschließlich für den Empfänger bestimmt und kann vertrauliche Informationen enthalten, die dem Berufsgeheimnis unterliegen und deren Weitergabe gesetzlich nicht gestattet ist.",
       "Sollten Sie diese Nachricht irrtümlich erhalten haben, bitten wir Sie, uns dies unverzüglich per E-Mail mitzuteilen und die Nachricht sowie etwaige Anhänge zu löschen.",
       "Ebenso ist die Verteilung, das Kopieren oder die Nutzung dieser Nachricht oder eines Anhangs, zu welchem Zweck auch immer, gesetzlich untersagt.",
-      "Zur Einhaltung der Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 können Sie Ihre Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und Datenübertragbarkeit kostenlos per E-Mail an info@lanzaroteexperiencetours.com oder unter folgender Adresse ausüben: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
+      "Zur Einhaltung der Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 können Sie Ihre Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und Datenübertragbarkeit kostenlos per E-Mail an info@lanzarotetransfers.es oder unter folgender Adresse ausüben: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
     ],
   },
 } as const;
@@ -351,14 +352,7 @@ export async function sendCustomerBookingEmail(
   const c = COPY[locale];
   const origin = resolvePublicOrigin(options?.origin);
   const links = bookingLinks(booking, origin, locale);
-  const mailbox = resolveBookingMailbox({
-    type: booking.type,
-    tourId: booking.tourId,
-    groupId: booking.groupId,
-    cruiseShip: booking.customer?.cruiseShip,
-    bookingId: booking.id,
-  });
-  const from = formatFromAddress(mailbox);
+  const from = formatFromAddress(VERIFIED_FROM_EMAIL);
 
   let title: string = c.confirmationTitle;
   let lead: string = c.confirmationLead;
@@ -468,7 +462,7 @@ export async function sendCustomerBookingEmail(
       brand: c.brand,
       lang: locale,
     }),
-    replyTo: mailbox,
+    replyTo: BOOKING_EMAIL,
   });
 }
 
@@ -532,7 +526,7 @@ export async function notifyOpsCancellation(
 
   return sendEmail({
     to,
-    from: formatFromAddress(to),
+    from: formatFromAddress(VERIFIED_FROM_EMAIL),
     subject: `[Cancelación] ${booking.id} · ${booking.tourTitle}`,
     text,
     html: emailLayout({
@@ -572,7 +566,7 @@ export async function sendContactAutoReply(input: {
   const text = bodies[locale];
   return sendEmail({
     to: input.email,
-    from: formatFromAddress(MAILBOX.support),
+    from: formatFromAddress(VERIFIED_FROM_EMAIL),
     subject: subjects[locale],
     text,
     html: emailLayout({
