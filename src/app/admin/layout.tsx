@@ -14,6 +14,7 @@ import {
   Handshake,
   Languages,
   LayoutDashboard,
+  Newspaper,
   LogOut,
   MessageSquareHeart,
   Link2,
@@ -46,6 +47,7 @@ const nav: NavItem[] = [
   { href: "/admin/importar-reservas", label: "Importar reservas", icon: Upload },
   { href: "/admin/feedback", label: "Feedback", icon: MessageSquareHeart },
   { href: "/admin/redirecciones", label: "Redirecciones", icon: Link2 },
+  { href: "/admin/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/traducciones", label: "Traducciones", icon: Languages },
   { href: "/admin/ajustes", label: "Ajustes", icon: Settings },
 ];

@@ -8,21 +8,30 @@ import {
 } from "@/lib/supabase/postgres";
 import { revalidateSite } from "@/lib/revalidate-site";
 
-export type UiTranslationOverrides = {
-  es: Record<string, string>;
-  en: Record<string, string>;
-  de: Record<string, string>;
-};
+export type UiTranslationOverrides = Record<Locale, Record<string, string>>;
 
-const empty: UiTranslationOverrides = { es: {}, en: {}, de: {} };
+const empty: UiTranslationOverrides = { es: {}, en: {}, de: {}, fr: {} };
 
 function emptyMaps(): UiTranslationOverrides {
-  return { es: {}, en: {}, de: {} };
+  return { es: {}, en: {}, de: {}, fr: {} };
 }
 
 export async function getUiTranslationOverrides(): Promise<UiTranslationOverrides> {
   const fromDb = await dbGetUiTranslations();
-  if (fromDb) return fromDb;
+  if (fromDb) {
+    if (Object.keys(fromDb.fr || {}).length > 0) return fromDb;
+    try {
+      const file = await readCmsJson<Partial<UiTranslationOverrides>>(
+        "uiTranslations.json"
+      );
+      if (file.fr && Object.keys(file.fr).length > 0) {
+        return { ...fromDb, fr: file.fr };
+      }
+    } catch {
+      /* el francés vive en el diccionario base */
+    }
+    return fromDb;
+  }
   try {
     const data = await readCmsJson<Partial<UiTranslationOverrides>>(
       "uiTranslations.json"
@@ -31,6 +40,7 @@ export async function getUiTranslationOverrides(): Promise<UiTranslationOverride
       es: data.es || {},
       en: data.en || {},
       de: data.de || {},
+      fr: data.fr || {},
     };
   } catch {
     return emptyMaps();
@@ -44,9 +54,26 @@ export async function saveUiTranslationOverrides(
     es: data.es || {},
     en: data.en || {},
     de: data.de || {},
+    fr: data.fr || {},
   };
-  if (!(await dbSaveUiTranslations(payload))) {
+  const savedInDb = await dbSaveUiTranslations(payload);
+  if (!savedInDb) {
     await writeCmsJson("uiTranslations.json", payload);
+  } else {
+    // Copia de seguridad del francés por si la tabla aún no admite «fr».
+    try {
+      const current = await readCmsJsonFresh<Partial<UiTranslationOverrides>>(
+        "uiTranslations.json"
+      );
+      await writeCmsJson("uiTranslations.json", {
+        es: current.es || payload.es,
+        en: current.en || payload.en,
+        de: current.de || payload.de,
+        fr: payload.fr,
+      });
+    } catch {
+      /* la base ya tiene ES/EN/DE; el francés de código sigue disponible */
+    }
   }
   revalidateSite();
 }
@@ -67,6 +94,7 @@ export async function updateUiTranslations(
       es: raw.es || {},
       en: raw.en || {},
       de: raw.de || {},
+      fr: raw.fr || {},
     };
   } catch {
     data = emptyMaps();

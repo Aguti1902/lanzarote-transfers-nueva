@@ -35,10 +35,12 @@ export type CustomerEmailKind =
   | "request"
   | "cancellation";
 
-type LocaleKey = "es" | "en" | "de";
+type LocaleKey = "es" | "en" | "de" | "fr";
 
 function localeOf(booking: Booking): LocaleKey {
-  return booking.locale === "en" || booking.locale === "de"
+  return booking.locale === "en" ||
+    booking.locale === "de" ||
+    booking.locale === "fr"
     ? booking.locale
     : "es";
 }
@@ -213,6 +215,63 @@ const COPY = {
       "Sollten Sie diese Nachricht irrtümlich erhalten haben, bitten wir Sie, uns dies unverzüglich per E-Mail mitzuteilen und die Nachricht sowie etwaige Anhänge zu löschen.",
       "Ebenso ist die Verteilung, das Kopieren oder die Nutzung dieser Nachricht oder eines Anhangs, zu welchem Zweck auch immer, gesetzlich untersagt.",
       "Zur Einhaltung der Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 können Sie Ihre Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und Datenübertragbarkeit kostenlos per E-Mail an info@lanzarotetransfers.es oder unter folgender Adresse ausüben: C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
+    ],
+  },
+  fr: {
+    brand: "Lanzarote Transfers",
+    greeting: (name: string) => `Bonjour ${name},`,
+    confirmationSubject: (id: string) =>
+      `Confirmation de réservation ${id} · Lanzarote Transfers`,
+    confirmationTitle: "Réservation confirmée !",
+    confirmationLead:
+      "Merci d'avoir réservé avec nous. Voici le résumé de votre réservation et les liens pour voir le bon, la gérer ou l'annuler.",
+    requestSubject: (id: string) =>
+      `Demande reçue ${id} · Lanzarote Transfers`,
+    requestTitle: "Nous avons reçu votre demande",
+    requestLead:
+      "Notre équipe examinera votre demande et vous contactera dès que possible.",
+    cancellationSubject: (id: string) =>
+      `Annulation de réservation ${id} · Lanzarote Transfers`,
+    cancellationTitle: "Réservation annulée",
+    cancellationLead:
+      "Nous confirmons que votre réservation a été annulée. Le détail figure ci-dessous.",
+    locator: "Référence",
+    service: "Service",
+    date: "Date du service",
+    time: "Heure",
+    returnDate: "Date de retour",
+    returnTime: "Heure de retour",
+    people: "Voyageurs",
+    adults: "adultes",
+    children: "enfants",
+    total: "Total",
+    payment: "Moyen de paiement",
+    paymentStatus: "État du paiement",
+    hotel: "Hôtel / prise en charge",
+    cruise: "Navire",
+    fee: "Frais d'annulation",
+    refund: "Montant à rembourser",
+    freeCancel: "Annulation gratuite",
+    reason: "Motif",
+    viewVoucher: "Voir le bon",
+    manage: "Gérer la réservation",
+    cancel: "Annuler la réservation",
+    viewInvoice: "Voir la facture",
+    footerHelp:
+      "Besoin d'aide ? Répondez à cet e-mail ou appelez le +34 646 08 05 85.",
+    paid: "Payé",
+    unpaid: "Non payé",
+    partial: "Partiel",
+    payOnDay: "Paiement le jour même",
+    refunded: "Remboursé",
+    cancelPolicyTitle: "Conditions d'annulation",
+    cancelPolicyBody:
+      "Si nous recevons votre demande d'annulation plus de 48 heures avant l'heure de prise en charge du service à annuler, le montant payé vous sera intégralement remboursé. Si l'annulation intervient moins de 48 heures avant l'heure prévue, aucun montant ne sera remboursé.",
+    legalNotice: [
+      "Ce message est destiné exclusivement à son destinataire et peut contenir des informations confidentielles soumises au secret professionnel, dont la divulgation n'est pas autorisée par la loi.",
+      "Si vous avez reçu ce message par erreur, merci de nous le signaler immédiatement par e-mail et de le supprimer, ainsi que toute pièce jointe.",
+      "De même, la distribution, la copie ou l'utilisation de ce message, ou de tout document joint, à quelque fin que ce soit, est interdite par la loi.",
+      "Conformément au règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016, vous pouvez exercer gratuitement vos droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité par e-mail à info@lanzarotetransfers.es ou à l'adresse suivante : C/ Calderetas, 100, C.P. 35550, San Bartolomé - Lanzarote (Las Palmas).",
     ],
   },
 } as const;
@@ -552,16 +611,20 @@ export async function sendContactAutoReply(input: {
   locale?: string;
 }): Promise<SendEmailResult> {
   const locale: LocaleKey =
-    input.locale === "en" || input.locale === "de" ? input.locale : "es";
+    input.locale === "en" || input.locale === "de" || input.locale === "fr"
+      ? input.locale
+      : "es";
   const subjects = {
     es: "Hemos recibido su mensaje · Lanzarote Transfers",
     en: "We have received your message · Lanzarote Transfers",
     de: "Wir haben Ihre Nachricht erhalten · Lanzarote Transfers",
+    fr: "Nous avons reçu votre message · Lanzarote Transfers",
   };
   const bodies = {
     es: `Hola ${input.name},\n\nGracias por escribirnos. Hemos recibido su mensaje y le responderemos lo antes posible.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
     en: `Hello ${input.name},\n\nThank you for contacting us. We have received your message and will reply as soon as possible.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
     de: `Hallo ${input.name},\n\nVielen Dank für Ihre Nachricht. Wir melden uns so schnell wie möglich.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
+    fr: `Bonjour ${input.name},\n\nMerci de nous avoir écrit. Nous avons reçu votre message et vous répondrons dès que possible.\n\nLanzarote Transfers\n+34 646 08 05 85\n${PUBLIC_CONTACT_EMAIL}`,
   };
   const text = bodies[locale];
   return sendEmail({

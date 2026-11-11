@@ -32,6 +32,7 @@ const localeTabs: { id: Locale; label: string }[] = [
   { id: "es", label: "Español" },
   { id: "en", label: "Inglés" },
   { id: "de", label: "Alemán" },
+  { id: "fr", label: "Francés" },
 ];
 
 type DestCopyMap = Record<string, string>;
@@ -41,8 +42,10 @@ export default function AdminTrasladosPage() {
   const [highlights, setHighlights] = useState<string[]>([]);
   const [highlightsEn, setHighlightsEn] = useState("");
   const [highlightsDe, setHighlightsDe] = useState("");
+  const [highlightsFr, setHighlightsFr] = useState("");
   const [destCopyEn, setDestCopyEn] = useState<DestCopyMap>({});
   const [destCopyDe, setDestCopyDe] = useState<DestCopyMap>({});
+  const [destCopyFr, setDestCopyFr] = useState<DestCopyMap>({});
   const [editing, setEditing] = useState<TransferDestination | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<TransferDestination>(emptyDest());
@@ -56,22 +59,26 @@ export default function AdminTrasladosPage() {
 
   async function load() {
     setLoading(true);
-    const [res, enRes, deRes] = await Promise.all([
+    const [res, enRes, deRes, frRes] = await Promise.all([
       fetch("/api/transfers"),
       fetch("/api/admin/content-translations?locale=en"),
       fetch("/api/admin/content-translations?locale=de"),
+      fetch("/api/admin/content-translations?locale=fr"),
     ]);
     const data = await res.json();
     const enData = enRes.ok ? await enRes.json() : {};
     const deData = deRes.ok ? await deRes.json() : {};
+    const frData = frRes.ok ? await frRes.json() : {};
     setDestinations(data.destinations || []);
     setHighlights(data.highlights || []);
     setHighlightsText(arrayToLines(data.highlights || []));
     setClosedDates(Array.isArray(data.closedDates) ? data.closedDates : []);
     setHighlightsEn(arrayToLines(enData.transfers?.highlights || []));
     setHighlightsDe(arrayToLines(deData.transfers?.highlights || []));
+    setHighlightsFr(arrayToLines(frData.transfers?.highlights || []));
     const enDest: DestCopyMap = {};
     const deDest: DestCopyMap = {};
+    const frDest: DestCopyMap = {};
     for (const [id, value] of Object.entries(
       (enData.transfers?.destinations || {}) as Record<
         string,
@@ -88,8 +95,17 @@ export default function AdminTrasladosPage() {
     )) {
       if (value?.description) deDest[id] = value.description;
     }
+    for (const [id, value] of Object.entries(
+      (frData.transfers?.destinations || {}) as Record<
+        string,
+        { description?: string }
+      >
+    )) {
+      if (value?.description) frDest[id] = value.description;
+    }
     setDestCopyEn(enDest);
     setDestCopyDe(deDest);
+    setDestCopyFr(frDest);
     setLoading(false);
   }
 
@@ -134,7 +150,8 @@ export default function AdminTrasladosPage() {
     if (destId) {
       const enText = destCopyEn[destId] || destCopyEn._draft || "";
       const deText = destCopyDe[destId] || destCopyDe._draft || "";
-      const [enSave, deSave] = await Promise.all([
+      const frText = destCopyFr[destId] || destCopyFr._draft || "";
+      const [enSave, deSave, frSave] = await Promise.all([
         fetch("/api/admin/content-translations", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -155,9 +172,19 @@ export default function AdminTrasladosPage() {
             },
           }),
         }),
+        fetch("/api/admin/content-translations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            locale: "fr",
+            transfers: {
+              destinations: { [destId]: { description: frText } },
+            },
+          }),
+        }),
       ]);
-      if (!enSave.ok || !deSave.ok) {
-        setError("Destino guardado en español, pero falló inglés o alemán");
+      if (!enSave.ok || !deSave.ok || !frSave.ok) {
+        setError("Destino guardado en español, pero falló inglés, alemán o francés");
         await load();
         return;
       }
@@ -205,7 +232,7 @@ export default function AdminTrasladosPage() {
       }),
     });
     const esData = await esRes.json().catch(() => ({}));
-    const [enRes, deRes] = await Promise.all([
+    const [enRes, deRes, frRes] = await Promise.all([
       fetch("/api/admin/content-translations", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -222,11 +249,19 @@ export default function AdminTrasladosPage() {
           transfers: { highlights: linesToArray(highlightsDe) },
         }),
       }),
+      fetch("/api/admin/content-translations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          locale: "fr",
+          transfers: { highlights: linesToArray(highlightsFr) },
+        }),
+      }),
     ]);
-    if (!esRes.ok || !enRes.ok || !deRes.ok) {
+    if (!esRes.ok || !enRes.ok || !deRes.ok || !frRes.ok) {
       setError(
         esData.error ||
-          "No se pudieron guardar las ventajas. Revisa español, inglés y alemán."
+          "No se pudieron guardar las ventajas. Revisa español, inglés, alemán y francés."
       );
       return;
     }
@@ -240,7 +275,9 @@ export default function AdminTrasladosPage() {
       ? destCopyEn[destId] || getDestinationCopy(form, "en")?.html || ""
       : copyLocale === "de"
         ? destCopyDe[destId] || getDestinationCopy(form, "de")?.html || ""
-        : form.description || "";
+        : copyLocale === "fr"
+          ? destCopyFr[destId] || getDestinationCopy(form, "fr")?.html || ""
+          : form.description || "";
 
   function setTextValue(value: string) {
     if (copyLocale === "en") {
@@ -249,6 +286,10 @@ export default function AdminTrasladosPage() {
     }
     if (copyLocale === "de") {
       setDestCopyDe((prev) => ({ ...prev, [destId]: value }));
+      return;
+    }
+    if (copyLocale === "fr") {
+      setDestCopyFr((prev) => ({ ...prev, [destId]: value }));
       return;
     }
     setForm({ ...form, description: value });
@@ -275,11 +316,11 @@ export default function AdminTrasladosPage() {
       </div>
 
       <div className="rounded-xl bg-sky-soft/70 px-4 py-3 text-sm text-ink">
-        <p className="font-semibold">Dónde se cambian los textos EN / DE</p>
+        <p className="font-semibold">Dónde se cambian los textos EN / DE / FR</p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-ink-muted">
           <li>
             <b>Esta página:</b> texto de cada destino y ventajas del servicio
-            (pestañas Español / Inglés / Alemán).
+            (pestañas Español / Inglés / Alemán / Francés).
           </li>
           <li>
             <b>Ajustes:</b> título, introducción y cuerpo de la página de
@@ -585,11 +626,14 @@ export default function AdminTrasladosPage() {
               ? highlightsEn
               : copyLocale === "de"
                 ? highlightsDe
-                : highlightsText
+                : copyLocale === "fr"
+                  ? highlightsFr
+                  : highlightsText
           }
           onChange={(e) => {
             if (copyLocale === "en") setHighlightsEn(e.target.value);
             else if (copyLocale === "de") setHighlightsDe(e.target.value);
+            else if (copyLocale === "fr") setHighlightsFr(e.target.value);
             else setHighlightsText(e.target.value);
           }}
         />

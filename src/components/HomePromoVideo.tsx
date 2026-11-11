@@ -9,7 +9,7 @@ export const HOME_PROMO_VIDEO = {
   title: "Lanzarote Transfers | Tu viaje comienza con nosotros.",
 } as const;
 
-export function HomePromoVideo() {
+export function HomePromoVideo({ label = HOME_PROMO_VIDEO.title }: { label?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [active, setActive] = useState(false);
 
@@ -29,7 +29,7 @@ export function HomePromoVideo() {
         type="button"
         onClick={() => setActive(true)}
         className="group relative block aspect-video w-full overflow-hidden rounded-2xl bg-[#122033] shadow-xl ring-1 ring-sand-line"
-        aria-label={HOME_PROMO_VIDEO.title}
+        aria-label={label}
       >
         <img
           src={HOME_PROMO_VIDEO.poster}
@@ -54,8 +54,8 @@ export function HomePromoVideo() {
       playsInline
       preload="none"
       poster={HOME_PROMO_VIDEO.poster}
-      title={HOME_PROMO_VIDEO.title}
-      aria-label={HOME_PROMO_VIDEO.title}
+      title={label}
+      aria-label={label}
     >
       <source src={HOME_PROMO_VIDEO.src} type="video/mp4" />
     </video>

@@ -213,7 +213,7 @@ export async function POST(request: Request) {
 
     const localeFromReferer = (() => {
       const referer = request.headers.get("referer") || "";
-      const match = referer.match(/\/(es|en|de)(?:\/|$)/i);
+      const match = referer.match(/\/(es|en|de|fr)(?:\/|$)/i);
       return match ? match[1].toLowerCase() : undefined;
     })();
 

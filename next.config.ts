@@ -197,23 +197,13 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/blog",
-        destination: "/es",
-        permanent: true,
+        destination: "/es/blog",
+        permanent: false,
       },
       {
         source: "/blog/:path*",
-        destination: "/es",
-        permanent: true,
-      },
-      {
-        source: "/:locale(es|en|de)/blog",
-        destination: "/:locale",
-        permanent: true,
-      },
-      {
-        source: "/:locale(es|en|de)/blog/:path*",
-        destination: "/:locale",
-        permanent: true,
+        destination: "/es/blog/:path*",
+        permanent: false,
       },
     ];
   },

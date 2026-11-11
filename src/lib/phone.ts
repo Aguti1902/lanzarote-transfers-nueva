@@ -23,6 +23,7 @@ export const PHONE_PREFIXES = [
 export function defaultPhonePrefix(locale?: string): string {
   if (locale === "de") return "+49";
   if (locale === "en") return "+44";
+  if (locale === "fr") return "+33";
   return "+34";
 }
 

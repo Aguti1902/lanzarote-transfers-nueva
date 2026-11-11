@@ -113,14 +113,21 @@ export async function middleware(request: NextRequest) {
       return securityHeaders(NextResponse.redirect(url, 301));
     }
 
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-locale", segment);
+
     const rewriteTarget = rewriteToInternalPathname(pathname);
     if (rewriteTarget && rewriteTarget !== pathname) {
       const url = request.nextUrl.clone();
       url.pathname = rewriteTarget;
-      return securityHeaders(NextResponse.rewrite(url));
+      return securityHeaders(
+        NextResponse.rewrite(url, { request: { headers: requestHeaders } })
+      );
     }
 
-    return securityHeaders(NextResponse.next());
+    return securityHeaders(
+      NextResponse.next({ request: { headers: requestHeaders } })
+    );
   }
 
   const locale = detectLocale(request);

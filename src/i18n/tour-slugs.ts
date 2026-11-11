@@ -6,6 +6,7 @@ type TourSlugSource = {
   translations?: {
     en?: { slug?: string };
     de?: { slug?: string };
+    fr?: { slug?: string };
   };
 };
 
@@ -13,6 +14,7 @@ export type TourLocaleSlugs = {
   es: string;
   en: string;
   de: string;
+  fr?: string;
   /** Slugs antiguos u otras variantes → redirigen al canónico del idioma. */
   aliases?: string[];
 };
@@ -118,17 +120,24 @@ export function resolveTourIdBySlug(slug: string): string | undefined {
 export function canonicalTourSlug(slug: string, locale: Locale): string {
   const hit = lookup(slug);
   if (!hit) return norm(slug) || slug;
+  if (locale === "fr") return hit.slugs.fr || hit.slugs.en;
   return hit.slugs[locale];
 }
 
 export function tourSlugForLocale(tour: TourSlugSource, locale: Locale): string {
   const mapped = TOUR_LOCALE_SLUGS[tour.id];
-  if (mapped) return mapped[locale];
+  if (mapped) {
+    if (locale === "fr") return mapped.fr || mapped.en;
+    return mapped[locale];
+  }
   if (locale === "en" && tour.translations?.en?.slug) {
     return norm(tour.translations.en.slug);
   }
   if (locale === "de" && tour.translations?.de?.slug) {
     return norm(tour.translations.de.slug);
+  }
+  if (locale === "fr" && tour.translations?.fr?.slug) {
+    return norm(tour.translations.fr.slug);
   }
   return tour.slug;
 }
@@ -139,9 +148,16 @@ export function tourMatchesSlug(tour: TourSlugSource, slug: string): boolean {
   if (norm(tour.slug) === key) return true;
   if (norm(tour.translations?.en?.slug || "") === key) return true;
   if (norm(tour.translations?.de?.slug || "") === key) return true;
+  if (norm(tour.translations?.fr?.slug || "") === key) return true;
   const mapped = TOUR_LOCALE_SLUGS[tour.id];
   if (!mapped) return false;
-  if (mapped.es === key || mapped.en === key || mapped.de === key) return true;
+  if (
+    mapped.es === key ||
+    mapped.en === key ||
+    mapped.de === key ||
+    mapped.fr === key
+  )
+    return true;
   return (mapped.aliases || []).some((alias) => alias === key);
 }
 
@@ -166,6 +182,7 @@ const SECTION_BY_LOCALE: Record<Locale, string> = {
   es: "/traslados-aeropuerto-lanzarote",
   en: "/lanzarote-airport-transfer",
   de: "/lanzarote-flughafen-transfer",
+  fr: "/transfert-aeroport-lanzarote",
 };
 
 /**
@@ -188,7 +205,7 @@ export function buildTourSlugRedirects(): Record<string, string> {
       slugs.de,
       ...(slugs.aliases || []),
     ]);
-    for (const locale of ["es", "en", "de"] as Locale[]) {
+    for (const locale of ["es", "en", "de", "fr"] as Locale[]) {
       const dest = `/${locale}${SECTION_BY_LOCALE[locale]}`;
       for (const slug of all) {
         add(`/${locale}/excursiones/${slug}`, dest);

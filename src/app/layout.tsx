@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Figtree, Outfit } from "next/font/google";
+import { headers } from "next/headers";
 import { AppLoadingProvider } from "@/components/AppLoadingProvider";
+import { defaultLocale, isLocale } from "@/i18n/config";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -39,13 +41,17 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerStore = await headers();
+  const requested = headerStore.get("x-locale");
+  const lang = requested && isLocale(requested) ? requested : defaultLocale;
+
   return (
-    <html lang="es" className={`${figtree.variable} ${outfit.variable} h-full`}>
+    <html lang={lang} className={`${figtree.variable} ${outfit.variable} h-full`}>
       <body className="flex min-h-full flex-col font-sans antialiased">
         <AppLoadingProvider>{children}</AppLoadingProvider>
       </body>

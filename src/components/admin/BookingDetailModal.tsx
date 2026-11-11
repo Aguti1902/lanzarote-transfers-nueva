@@ -68,7 +68,10 @@ function serviceKind(b: Booking) {
 function voucherHtml(b: Booking) {
   return buildVoucherHtml(b, {
     origin: typeof window !== "undefined" ? window.location.origin : "",
-    locale: b.locale === "en" || b.locale === "de" ? b.locale : "es",
+    locale:
+      b.locale === "en" || b.locale === "de" || b.locale === "fr"
+        ? b.locale
+        : "es",
   });
 }
 

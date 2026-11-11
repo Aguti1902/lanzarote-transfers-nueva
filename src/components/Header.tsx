@@ -18,6 +18,7 @@ export function Header() {
 
   const links = [
     { href: href("/traslados"), path: "/traslados-aeropuerto-lanzarote", label: dict.nav.transfers },
+    { href: href("/blog"), path: "/blog", label: dict.nav.blog },
     { href: href("/sobre-nosotros"), path: "/sobre-nosotros", label: dict.nav.about },
     { href: href("/contacto"), path: "/contacto", label: dict.nav.contact },
   ];

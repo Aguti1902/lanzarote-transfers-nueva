@@ -63,9 +63,10 @@ type UiTranslationOverrides = {
   es: Record<string, string>;
   en: Record<string, string>;
   de: Record<string, string>;
+  fr: Record<string, string>;
 };
 
-type TranslatedLocale = "en" | "de";
+type TranslatedLocale = "en" | "de" | "fr";
 type ContentTranslations = Record<string, unknown>;
 
 function useDb(): boolean {
@@ -710,10 +711,10 @@ export async function dbGetUiTranslations(): Promise<UiTranslationOverrides | nu
       .select("locale, data");
     if (error) throw error;
     if (!data?.length) return null;
-    const next: UiTranslationOverrides = { es: {}, en: {}, de: {} };
+    const next: UiTranslationOverrides = { es: {}, en: {}, de: {}, fr: {} };
     for (const row of data) {
       const locale = String((row as { locale: string }).locale);
-      if (locale === "es" || locale === "en" || locale === "de") {
+      if (locale === "es" || locale === "en" || locale === "de" || locale === "fr") {
         next[locale] = ((row as { data: Record<string, string> }).data) || {};
       }
     }
@@ -725,15 +726,18 @@ export async function dbSaveUiTranslations(
   data: UiTranslationOverrides
 ): Promise<boolean> {
   const ok = await runDb("ui-translations-save", async () => {
-    const { error } = await getSupabaseAdmin().from("ui_translation_overrides").upsert(
-      [
-        { locale: "es", data: data.es || {} },
-        { locale: "en", data: data.en || {} },
-        { locale: "de", data: data.de || {} },
-      ],
-      { onConflict: "locale" }
-    );
-    if (error) throw error;
+    const sb = getSupabaseAdmin();
+    for (const locale of ["es", "en", "de", "fr"] as const) {
+      const { error } = await sb.from("ui_translation_overrides").upsert(
+        { locale, data: data[locale] || {} },
+        { onConflict: "locale" }
+      );
+      if (error) {
+        const message = String(error.message || "");
+        if (locale === "fr" && /check|constraint|23514/i.test(message)) continue;
+        throw error;
+      }
+    }
     return true;
   });
   return ok === true;

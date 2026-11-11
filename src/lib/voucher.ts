@@ -151,12 +151,11 @@ export function buildVoucherHtml(
   };
 
   const origin = resolvePublicOrigin(options?.origin);
+  const preferred = options?.locale || booking.locale;
   const locale =
-    options?.locale === "en" || options?.locale === "de"
-      ? options.locale
-      : booking.locale === "en" || booking.locale === "de"
-        ? booking.locale
-        : "es";
+    preferred === "en" || preferred === "de" || preferred === "fr"
+      ? preferred
+      : "es";
   // Always embed logo as data URI so print/download/blob windows never break,
   // and it stays visible on the voucher (logo is white → needs dark plate).
   const logoUrl = options?.logoUrl || BRAND_LOGO_DATA_URI;

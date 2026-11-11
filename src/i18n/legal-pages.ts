@@ -1,4 +1,5 @@
 import type { Locale } from "./config";
+import { frLegal } from "./legal-fr";
 
 export type LegalSection = { heading: string; paragraphs: string[] };
 
@@ -634,7 +635,7 @@ const de: LegalBundle = {
   },
 };
 
-const bundles: Record<Locale, LegalBundle> = { es, en, de };
+const bundles: Record<Locale, LegalBundle> = { es, en, de, fr: frLegal };
 
 export function getLegalPages(locale: Locale): LegalBundle {
   return bundles[locale] ?? bundles.es;

@@ -100,6 +100,7 @@ const empty: SiteSettings = {
   bannerEs: "",
   bannerEn: "",
   bannerDe: "",
+  bannerFr: "",
 };
 
 const HERO_HINT =
@@ -109,7 +110,14 @@ const localeTabs: { id: Locale; label: string }[] = [
   { id: "es", label: "Español" },
   { id: "en", label: "Inglés" },
   { id: "de", label: "Alemán" },
+  { id: "fr", label: "Francés" },
 ];
+
+const LOCALE_NAME: Record<Exclude<Locale, "es">, string> = {
+  en: "inglés",
+  de: "alemán",
+  fr: "francés",
+};
 
 type SectionId = "brand" | "home" | "about" | "transfers";
 
@@ -148,6 +156,7 @@ export default function AdminAjustesPage() {
   const [settings, setSettings] = useState<SiteSettings>(empty);
   const [en, setEn] = useState<Partial<SiteSettings>>(emptyOverlay());
   const [de, setDe] = useState<Partial<SiteSettings>>(emptyOverlay());
+  const [fr, setFr] = useState<Partial<SiteSettings>>(emptyOverlay());
   const [locale, setLocale] = useState<Locale>("es");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -159,18 +168,21 @@ export default function AdminAjustesPage() {
     async function load() {
       setLoading(true);
       try {
-        const [esRes, enRes, deRes] = await Promise.all([
+        const [esRes, enRes, deRes, frRes] = await Promise.all([
           fetch("/api/settings"),
           fetch("/api/admin/content-translations?locale=en"),
           fetch("/api/admin/content-translations?locale=de"),
+          fetch("/api/admin/content-translations?locale=fr"),
         ]);
         const esData = await esRes.json();
         const enData = await enRes.json();
         const deData = await deRes.json();
+        const frData = await frRes.json();
         if (cancelled) return;
         setSettings({ ...empty, ...esData.settings });
         setEn({ ...emptyOverlay(), ...pickSettingsTranslations(enData.settings) });
         setDe({ ...emptyOverlay(), ...pickSettingsTranslations(deData.settings) });
+        setFr({ ...emptyOverlay(), ...pickSettingsTranslations(frData.settings) });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -181,8 +193,10 @@ export default function AdminAjustesPage() {
     };
   }, []);
 
-  const overlay = locale === "en" ? en : locale === "de" ? de : null;
-  const setOverlay = locale === "en" ? setEn : locale === "de" ? setDe : null;
+  const overlay =
+    locale === "en" ? en : locale === "de" ? de : locale === "fr" ? fr : null;
+  const setOverlay =
+    locale === "en" ? setEn : locale === "de" ? setDe : locale === "fr" ? setFr : null;
 
   function textValue(key: SettingsStringKey): string {
     if (locale === "es") {
@@ -291,7 +305,7 @@ export default function AdminAjustesPage() {
       });
       if (!esRes.ok) throw new Error("es");
 
-      const [enRes, deRes] = await Promise.all([
+      const [enRes, deRes, frRes] = await Promise.all([
         fetch("/api/admin/content-translations", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -302,8 +316,13 @@ export default function AdminAjustesPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ locale: "de", settings: de }),
         }),
+        fetch("/api/admin/content-translations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ locale: "fr", settings: fr }),
+        }),
       ]);
-      if (!enRes.ok || !deRes.ok) throw new Error("i18n");
+      if (!enRes.ok || !deRes.ok || !frRes.ok) throw new Error("i18n");
 
       setMessage(
         "Ajustes y traducciones guardados. Se reflejan en la web pública (puede tardar unos segundos por la caché)."
@@ -339,14 +358,19 @@ export default function AdminAjustesPage() {
         ...de,
         ...pickSettingsTranslations(data.translations?.de),
       };
+      const nextFr = {
+        ...fr,
+        ...pickSettingsTranslations(data.translations?.fr),
+      };
       setEn(nextEn);
       setDe(nextDe);
+      setFr(nextFr);
 
       if (locale === "es") setLocale("en");
       setMessage(
         data.mode === "openai"
-          ? "Traducciones generadas (EN y DE). Revíselas y pulse Guardar."
-          : "Borrador generado sin OpenAI (copia del español). Edite EN/DE y guarde. Configure OPENAI_API_KEY para traducción automática."
+          ? "Traducciones generadas (EN, DE y FR). Revíselas y pulse Guardar."
+          : "Borrador generado sin OpenAI (copia del español). Edite EN/DE/FR y guarde. Configure OPENAI_API_KEY para traducción automática."
       );
     } catch {
       setMessage("No se pudieron generar las traducciones");
@@ -359,7 +383,7 @@ export default function AdminAjustesPage() {
     if (locale === "es") {
       return "Editando textos en español (base). Las imágenes son comunes a todos los idiomas.";
     }
-    return `Editando textos en ${locale === "en" ? "inglés" : "alemán"}. Aquí se traducen: textos, apartados («Lanzarote, una isla…»), FAQs y títulos. Si un campo está vacío, no se muestra el español en la web. Use «Generar esta sección» o «Generar traducciones EN + DE», revise y pulse Guardar.`;
+    return `Editando textos en ${LOCALE_NAME[locale]}. Aquí se traducen textos, apartados, FAQs y títulos. Si un campo está vacío, no se muestra el español en la web. Use «Generar esta sección» o «Generar traducciones EN + DE + FR», revise y pulse Guardar.`;
   }, [locale]);
 
   if (loading) return <p className="text-ink-muted">Cargando…</p>;
@@ -371,7 +395,7 @@ export default function AdminAjustesPage() {
           <h1 className="font-display text-3xl text-ink">Ajustes de la web</h1>
           <p className="mt-1 max-w-2xl text-sm text-ink-muted">
             Textos e imágenes por página. En cada idioma puede editar los textos;
-            puede generar EN/DE automáticamente y luego retocarlos.
+            puede generar EN/DE/FR automáticamente y luego retocarlos.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -400,7 +424,7 @@ export default function AdminAjustesPage() {
           onClick={() => generateTranslations()}
           className="ml-auto rounded bg-header px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
         >
-          {generating ? "Generando…" : "Generar traducciones EN + DE"}
+          {generating ? "Generando…" : "Generar traducciones EN + DE + FR"}
         </button>
       </div>
 

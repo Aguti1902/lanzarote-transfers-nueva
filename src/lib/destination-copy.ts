@@ -63,6 +63,23 @@ const PLAYA_BLANCA_HTML: Record<Locale, string> = {
 <p>Sie können auch den Rücktransfer ab Playa Blanca buchen, mit Abholung an Ihrer Unterkunft.</p>
 <p><em>Buchen Sie jetzt Ihren privaten Transfer und genießen Sie Lanzarote vom ersten Moment an.</em></p>
 `.trim(),
+  fr: `
+<p>Profitez d'un transfert confortable et direct de l'aéroport de Lanzarote jusqu'à votre hébergement à Playa Blanca.</p>
+<p>Votre chauffeur vous attend dans le hall des arrivées avec un panneau à votre nom, prêt à vous conduire à votre hôtel, appartement ou villa.</p>
+<p>Pas de véhicule partagé, pas d'attente inutile, et la tranquillité d'avoir tout organisé avant d'atterrir.</p>
+<h2>Votre transfert vers Playa Blanca</h2>
+<ul>
+<li><em>Durée :</em> environ 35–45 minutes.</li>
+<li><em>Service :</em> privé et direct jusqu'à votre hébergement.</li>
+<li><em>Comprend :</em> accueil à l'aéroport, suivi du vol et véhicule climatisé.</li>
+</ul>
+<h2>Découvrir Playa Blanca</h2>
+<p>Au sud de Lanzarote, Playa Blanca se distingue par ses plages, sa promenade et Marina Rubicón.</p>
+<p>Que vous veniez vous reposer ou explorer l'île, nous veillons à ce que vous arriviez confortablement.</p>
+<h2>Et pour revenir à l'aéroport ?</h2>
+<p>Vous pouvez aussi réserver le retour depuis Playa Blanca, avec prise en charge à votre hébergement.</p>
+<p><em>Réservez maintenant votre transfert privé et profitez de Lanzarote dès le premier instant.</em></p>
+`.trim(),
 };
 
 const COPY: Record<string, Partial<Record<Locale, DestinationCopy>>> = {
@@ -92,6 +109,15 @@ const COPY: Record<string, Partial<Record<Locale, DestinationCopy>>> = {
       headline: "Privater Transfer vom Flughafen Lanzarote nach Playa Blanca.",
       tagline: "Ihre Reise beginnt mit uns.",
       html: PLAYA_BLANCA_HTML.de,
+    },
+    fr: {
+      seoTitle: "Transfert privé aéroport de Lanzarote vers Playa Blanca",
+      seoDescription:
+        "Réservez un transfert privé de l'aéroport de Lanzarote à Playa Blanca. Accueil avec panneau et trajet direct jusqu'à votre hébergement.",
+      headline:
+        "Transfert privé de l'aéroport de Lanzarote à Playa Blanca.",
+      tagline: "Votre voyage commence avec nous.",
+      html: PLAYA_BLANCA_HTML.fr,
     },
   },
 };
@@ -127,13 +153,21 @@ function hideTariffLines(text: string): string {
     .trim();
 }
 
+function spanishBlurb(dest: Pick<TransferDestination, "id" | "slug"> & { name?: string }): string {
+  const base = getDestinationCopy(dest, "es");
+  if (!base) return "";
+  return [base.headline, base.tagline].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+}
+
 export function destinationBodyHtml(
   dest: TransferDestination,
   locale: Locale
 ): string {
   const copy = getDestinationCopy(dest, locale);
-  const custom = dest.description?.trim() || "";
-  const source = custom || copy?.html || "";
+  const custom = (dest.description || "").replace(/\s+/g, " ").trim();
+  const untranslated =
+    locale !== "es" && custom.length > 0 && custom === spanishBlurb(dest);
+  const source = untranslated ? copy?.html || "" : custom || copy?.html || "";
   return hideTariffLines(source);
 }
 

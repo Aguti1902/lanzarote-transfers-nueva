@@ -51,7 +51,7 @@ export async function createStripeCheckoutForBookings(
   const primary = payable[0];
   const rawLocale = options?.locale || primary.locale || "es";
   const localeNorm =
-    rawLocale === "en" || rawLocale === "de" || rawLocale === "es"
+    rawLocale === "en" || rawLocale === "de" || rawLocale === "fr" || rawLocale === "es"
       ? rawLocale
       : "es";
 

@@ -1,0 +1,46 @@
+{
+  "settings": {
+    "hours": "Contact 24 h/24",
+    "tagline": "Transferts privés aéroport ↔ hôtel",
+    "homeHeadline": "Lanzarote Transfers",
+    "homeSubheadline": "Transferts privés aéroport ↔ hôtel",
+    "aboutTitle": "Lanzarote Transfers",
+    "aboutLead": "Nous sommes une entreprise familiale locale de Lanzarote, spécialisée dans les transferts privés. Notre objectif est simple : une arrivée et un départ confortables et ponctuels, sans attente.",
+    "aboutText": "Nous vous attendons dans le hall des arrivées de l'aéroport de Lanzarote (ACE) avec un panneau à votre nom et nous vous conduisons porte à porte jusqu'à votre hôtel, villa ou hébergement.\n\nNous travaillons avec des véhicules climatisés et des chauffeurs locaux qui connaissent chaque zone de l'île : Playa Blanca, Puerto del Carmen, Costa Teguise, Puerto Calero, Arrecife et plus encore.\n\nSi votre vol est retardé, nous adaptons la prise en charge. Réservez un aller, un retour ou un aller-retour en ligne, avec un tarif par véhicule et une confirmation immédiate.",
+    "aboutValues": "Ponctualité\nConfort\nTransparence\nAssistance 24 h/24\nChauffeur local\nTarif fixe",
+    "aboutPromise": "Transferts 100 % privés, accueil nominatif et véhicule climatisé. Le prix est par véhicule, pas par personne, et nous adaptons la prise en charge si votre vol est retardé.",
+    "excursionsTitle": "Activités et excursions guidées à Lanzarote",
+    "excursionsIntro": "Excursions, activités et visites guidées pour découvrir le meilleur de Lanzarote en petits groupes et uniquement en espagnol.",
+    "excursionsText": "Nous organisons des visites guidées en direct, sans intermédiaires, avec prise en charge à votre hébergement et en petits groupes (14 personnes maximum).\n\nChaque itinéraire est conçu pour profiter de Timanfaya, des Jameos del Agua, de l'œuvre de César Manrique et des coins moins fréquentés de l'île, avec du temps et des explications claires.",
+    "blogTitle": "Blog de Lanzarote",
+    "blogIntro": "Idées et conseils pour profiter au mieux de votre séjour sur l'île.",
+    "blogText": "Sur notre blog, vous trouverez des guides pratiques, des recommandations de saison et des réponses aux questions les plus fréquentes avant de réserver une excursion ou un transfert.\n\nNous mettons le contenu à jour pour vous aider à organiser votre séjour à Lanzarote.",
+    "cruiseHeadline": "Excursions à terre aux Canaries",
+    "cruiseIntro": "Profitez de votre escale à Lanzarote (saison 2026-2027, Puerto de Los Mármoles) et découvrez l'île avec des excursions adaptées à l'heure de retour à bord.",
+    "cruiseText": "Nous concevons les excursions selon le temps réellement disponible pendant l'escale : prise en charge au quai, visite des incontournables et retour au navire avec de la marge.\n\nConsultez le calendrier des croisières, choisissez votre compagnie et réservez l'excursion qui correspond le mieux à votre heure de retour à bord.",
+    "transferTitle": "Transferts privés aéroport ↔ hôtel",
+    "transferIntro": "Passez plus de temps à profiter de l'île et moins de temps à l'aéroport en réservant un transfert privé jusqu'à votre hôtel. Notre chauffeur vous attend dans le terminal des arrivées.",
+    "transferText": "Nous proposons des transferts privés porte à porte entre l'aéroport de Lanzarote (ACE) et les principales zones touristiques : Playa Blanca, Puerto del Carmen, Costa Teguise, Puerto Calero et d'autres.\n\nVous pouvez réserver un aller à l'arrivée, un retour au départ ou un aller-retour. Le prix est par véhicule (pas par personne) et le chauffeur vous attend avec un panneau à votre nom.\n\nSi votre vol est retardé, nous adaptons l'heure de prise en charge. Indiquez votre numéro de vol et votre hôtel lors de la réservation pour une arrivée sans stress."
+  },
+  "tours": {},
+  "blog": {},
+  "transfers": {
+    "destinations": {
+      "playa-blanca": {
+        "description": "Transfert privé de l'aéroport de Lanzarote à Playa Blanca. Votre voyage commence avec nous."
+      }
+    },
+    "highlights": [
+      "Service 100 % privé",
+      "Accueil dans le terminal des arrivées avec un panneau à votre nom",
+      "Véhicules confortables et climatisés",
+      "Suivi du vol pour coordonner la prise en charge à l'aéroport",
+      "Tarifs fixes, sans surprise",
+      "Disponible à l'arrivée et au départ de l'hôtel"
+    ]
+  },
+  "shoreTours": {},
+  "cruise": {
+    "seaDayLabel": "En mer"
+  }
+}

@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type {
+  BlogPost,
   CruiseCall,
   CruisesData,
   PageContentBlock,
@@ -9,6 +10,16 @@ import type {
   TransferDestination,
   TransfersData,
 } from "@/types";
+import {
+  blogAllSlugs,
+  blogMatchesSlug,
+  normalizeBlogSlug,
+} from "@/i18n/blog-slugs";
+import {
+  getBlogTopicTags,
+  normalizeBlogSeo,
+  normalizeBlogTranslations,
+} from "@/lib/blog-locale";
 import {
   DEFAULT_EXCURSIONS_BLOCKS,
   DEFAULT_EXCURSIONS_BLOCKS_INTRO,
@@ -386,6 +397,136 @@ export async function updateTransferHighlights(
   return clean;
 }
 
+/* ── Blog ── */
+
+export const getBlogPosts = cache(async (): Promise<BlogPost[]> => {
+  try {
+    const posts = await readJson<BlogPost[]>("blog.json");
+    return Array.isArray(posts) ? posts : [];
+  } catch {
+    return [];
+  }
+});
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  return (await getBlogPosts()).find((p) => blogMatchesSlug(p, slug));
+}
+
+export async function saveBlogPosts(posts: BlogPost[]): Promise<void> {
+  await writeJson("blog.json", posts);
+  revalidateSite();
+}
+
+function assertBlogSlugsUnique(
+  posts: BlogPost[],
+  candidate: BlogPost,
+  ignoreSlug?: string
+) {
+  const used = new Set<string>();
+  for (const post of posts) {
+    if (ignoreSlug && post.slug === ignoreSlug) continue;
+    for (const s of blogAllSlugs(post)) used.add(s);
+  }
+  for (const s of blogAllSlugs(candidate)) {
+    if (used.has(s)) {
+      throw new Error(`El slug «${s}» ya está en uso por otro artículo`);
+    }
+  }
+}
+
+export async function upsertBlogPost(
+  post: BlogPost,
+  options?: { previousSlug?: string }
+): Promise<BlogPost> {
+  const posts = await readJsonFresh<BlogPost[]>("blog.json").catch(() => [] as BlogPost[]);
+  const previousSlug = options?.previousSlug || post.slug;
+  const existing = posts.find((p) => p.slug === previousSlug);
+  const translations = normalizeBlogTranslations(post.translations);
+  const seo = normalizeBlogSeo(post.seo);
+  const nextSlug = normalizeBlogSlug(post.slug) || post.slug;
+  const published =
+    post.published !== undefined
+      ? post.published !== false
+      : existing
+        ? existing.published !== false
+        : true;
+  const normalized: BlogPost = {
+    ...post,
+    slug: nextSlug,
+    tags: getBlogTopicTags(post.tags),
+    ...(published ? {} : { published: false }),
+    ...(post.imageAlt?.trim()
+      ? { imageAlt: post.imageAlt.trim() }
+      : { imageAlt: undefined }),
+    ...(seo ? { seo } : { seo: undefined }),
+    ...(translations ? { translations } : { translations: undefined }),
+  };
+  if (published) delete normalized.published;
+  if (!normalized.imageAlt) delete normalized.imageAlt;
+  if (!seo) delete normalized.seo;
+  if (!translations) delete normalized.translations;
+  assertBlogSlugsUnique(posts, normalized, previousSlug);
+  const idx = posts.findIndex((p) => p.slug === previousSlug);
+  if (idx === -1) posts.unshift(normalized);
+  else posts[idx] = normalized;
+  await saveBlogPosts(posts);
+  return normalized;
+}
+
+export async function createBlogPost(
+  input: Partial<BlogPost> & Pick<BlogPost, "title" | "excerpt" | "content">
+): Promise<BlogPost> {
+  const posts = await readJsonFresh<BlogPost[]>("blog.json").catch(() => [] as BlogPost[]);
+  const baseSlug = normalizeBlogSlug(input.slug || input.title) || slugify(input.title);
+  let slug = baseSlug;
+  let n = 2;
+  const taken = new Set(posts.flatMap((p) => blogAllSlugs(p)));
+  while (taken.has(slug)) slug = `${baseSlug}-${n++}`;
+  const translations = normalizeBlogTranslations(input.translations);
+  const seo = normalizeBlogSeo(input.seo);
+  const post: BlogPost = {
+    slug,
+    title: input.title,
+    excerpt: input.excerpt,
+    content: input.content,
+    image: input.image || "/images/heroes/transfer.jpg",
+    date: input.date || new Date().toISOString().slice(0, 10),
+    author: input.author || "Equipo Lanzarote Transfers",
+    tags: getBlogTopicTags(input.tags || []),
+    ...(input.published === false ? { published: false } : {}),
+    ...(input.imageAlt?.trim() ? { imageAlt: input.imageAlt.trim() } : {}),
+    ...(seo ? { seo } : {}),
+    ...(translations ? { translations } : {}),
+  };
+  assertBlogSlugsUnique(posts, post);
+  posts.unshift(post);
+  await saveBlogPosts(posts);
+  return post;
+}
+
+export async function setBlogPostPublished(
+  slug: string,
+  published: boolean
+): Promise<BlogPost | undefined> {
+  const posts = await readJsonFresh<BlogPost[]>("blog.json");
+  const idx = posts.findIndex((p) => p.slug === slug);
+  if (idx === -1) return undefined;
+  const next: BlogPost = { ...posts[idx] };
+  if (published) delete next.published;
+  else next.published = false;
+  posts[idx] = next;
+  await saveBlogPosts(posts);
+  return next;
+}
+
+export async function deleteBlogPost(slug: string): Promise<boolean> {
+  const posts = await readJsonFresh<BlogPost[]>("blog.json");
+  const next = posts.filter((p) => p.slug !== slug);
+  if (next.length === posts.length) return false;
+  await saveBlogPosts(next);
+  return true;
+}
+
 /* ── Cruises (port calls) ── */
 
 const defaultCruisesData: CruisesData = {
@@ -555,6 +696,7 @@ const defaultSettings: SiteSettings = {
     "Excursiones personalizadas · Empresa familiar de Lanzarote · Gracias por apoyar el comercio local · Grupos reducidos",
   bannerEn: "",
   bannerDe: "",
+  bannerFr: "",
   excursionsFaqTitle: DEFAULT_EXCURSIONS_FAQ_TITLE,
   excursionsFaqs: DEFAULT_EXCURSIONS_FAQS,
   excursionsBlocksTitle: DEFAULT_EXCURSIONS_BLOCKS_TITLE,

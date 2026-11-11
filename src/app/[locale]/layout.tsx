@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -13,6 +14,23 @@ export const revalidate = 60;
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : "es";
+  const dict = await getDictionary(locale);
+  return {
+    title: {
+      absolute: dict.meta.title,
+      template: "%s | Lanzarote Transfers",
+    },
+    description: dict.meta.description,
+  };
 }
 
 export default async function LocaleLayout({

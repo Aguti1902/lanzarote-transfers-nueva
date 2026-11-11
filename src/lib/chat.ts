@@ -98,6 +98,7 @@ const langName: Record<string, string> = {
   es: "español",
   en: "English",
   de: "Deutsch",
+  fr: "français",
 };
 
 async function openaiReply(
@@ -157,7 +158,9 @@ export async function answerChat(
         ? "Tell me how I can help: destinations, fares or booking a transfer."
         : locale === "de"
           ? "Sagen Sie mir, womit ich helfen kann: Ziele, Preise oder Transferbuchung."
-          : "Cuéntame en qué puedo ayudarte: destinos, tarifas o reservar un traslado.";
+          : locale === "fr"
+            ? "Dites-moi comment je peux vous aider : destinations, tarifs ou réservation d'un transfert."
+            : "Cuéntame en qué puedo ayudarte: destinos, tarifas o reservar un traslado.";
     return { reply: empty, mode: "local" };
   }
 

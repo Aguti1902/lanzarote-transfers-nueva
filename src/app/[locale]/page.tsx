@@ -52,6 +52,10 @@ const BANNER_ALT: Record<Locale, { airport: string; fleet: string }> = {
     airport: "Illustration eines Reisenden und eines Fahrzeugs im Flughafenterminal",
     fleet: "Illustration eines Privatfahrzeugs in der Landschaft von Lanzarote",
   },
+  fr: {
+    airport: "Illustration d'un voyageur et d'un véhicule dans le terminal de l'aéroport",
+    fleet: "Illustration d'un véhicule privé dans le paysage de Lanzarote",
+  },
 };
 
 /** ISR: HTML/RSC cacheados; CMS se refresca ~cada 60s o al guardar. */
@@ -90,7 +94,9 @@ export default async function HomePage({ params }: Props) {
       ? settings.bannerEn
       : locale === "de"
         ? settings.bannerDe
-        : settings.bannerEs) || dict.home.marquee;
+        : locale === "fr"
+          ? settings.bannerFr
+          : settings.bannerEs) || dict.home.marquee;
   const featuredDestinations = transfers.destinations.slice(0, 6);
 
   return (
@@ -98,7 +104,7 @@ export default async function HomePage({ params }: Props) {
       <section className="relative min-h-[88vh] overflow-hidden bg-[#122033] text-white md:min-h-[92vh]">
         <Image
           src={settings.homeHeroImage}
-          alt="Traslado privado en Lanzarote"
+          alt={settings.homeHeadline || "Lanzarote Transfers"}
           fill
           priority
           fetchPriority="high"
@@ -312,7 +318,7 @@ export default async function HomePage({ params }: Props) {
 
       <section className="border-t border-sand-line bg-gradient-to-b from-sky-soft/70 to-white py-20 md:py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 md:grid-cols-[1.15fr_0.85fr] md:px-6">
-          <HomePromoVideo />
+          <HomePromoVideo label={dict.meta.title} />
           <div>
             <h2 className="section-title">{dict.home.islandTitle}</h2>
             <p className="mt-5 text-base leading-relaxed text-ink-muted">
@@ -330,7 +336,7 @@ export default async function HomePage({ params }: Props) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "VideoObject",
-              name: HOME_PROMO_VIDEO.title,
+              name: dict.meta.title,
               description: dict.home.islandBody,
               thumbnailUrl: `${resolvePublicOrigin()}${HOME_PROMO_VIDEO.poster}`,
               contentUrl: `${resolvePublicOrigin()}${HOME_PROMO_VIDEO.src}`,

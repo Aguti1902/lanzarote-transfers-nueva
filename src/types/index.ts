@@ -1,3 +1,5 @@
+import type { ContentLocale, Locale } from "@/i18n/config";
+
 export type GroupSize = "small" | "large";
 export type TourCategory = "excursion" | "private" | "minibus" | "transfer";
 export type PaymentMethod =
@@ -97,10 +99,7 @@ export interface Tour {
     seats: number;
   }>;
   seo?: TourSeo;
-  translations?: {
-    en?: TourTranslation;
-    de?: TourTranslation;
-  };
+  translations?: Partial<Record<ContentLocale, TourTranslation & { slug?: string }>>;
 }
 
 export interface TransferDestination {
@@ -115,6 +114,40 @@ export interface TransferDestination {
   distance: string;
   image?: string;
   description?: string;
+}
+
+/** SEO de un artículo de blog (por idioma). */
+export interface BlogSeo {
+  title?: string;
+  description?: string;
+  keywords?: string;
+}
+
+/** Traducción de un artículo. El español va en los campos base. */
+export interface BlogPostTranslation {
+  slug?: string;
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  author?: string;
+  tags?: string[];
+  imageAlt?: string;
+  seo?: BlogSeo;
+}
+
+export interface BlogPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  date: string;
+  author: string;
+  tags: string[];
+  published?: boolean;
+  imageAlt?: string;
+  seo?: BlogSeo;
+  translations?: Partial<Record<ContentLocale, BlogPostTranslation>>;
 }
 
 export interface VacationHouseTranslation {
@@ -137,10 +170,7 @@ export interface VacationHouse {
   redirectUrl: string;
   active: boolean;
   sortOrder: number;
-  translations?: {
-    en?: VacationHouseTranslation;
-    de?: VacationHouseTranslation;
-  };
+  translations?: Partial<Record<ContentLocale, VacationHouseTranslation>>;
 }
 
 /** FAQ editable por página desde Ajustes. */
@@ -250,6 +280,7 @@ export interface SiteSettings {
   bannerEs?: string;
   bannerEn?: string;
   bannerDe?: string;
+  bannerFr?: string;
 }
 
 export type PaymentLinkMode = "standard" | "group_all" | "per_person";
@@ -265,7 +296,7 @@ export interface PaymentLink {
   status: "pending" | "paid" | "cancelled";
   customerName?: string;
   customerEmail?: string;
-  customerLocale?: "es" | "en" | "de";
+  customerLocale?: Locale;
   notes?: string;
   paidAt?: string;
   paymentMethod?: string;
@@ -347,7 +378,7 @@ export interface CruiseGroup {
 export interface SeoRedirect {
   id: string;
   httpCode: 301 | 302;
-  locale: "es" | "en" | "de";
+  locale: Locale;
   fromSlug: string;
   toSlug: string;
 }
@@ -440,10 +471,7 @@ export interface CruiseShoreTour {
     seats: number;
   }>;
   seo?: TourSeo;
-  translations?: {
-    en?: CruiseShoreTourTranslation;
-    de?: CruiseShoreTourTranslation;
-  };
+  translations?: Partial<Record<ContentLocale, CruiseShoreTourTranslation>>;
 }
 
 export interface CruiseItineraryStop {

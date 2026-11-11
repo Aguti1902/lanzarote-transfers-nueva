@@ -1,22 +1,23 @@
 import { buildTourSlugRedirects } from "../i18n/tour-slugs";
-import type { Locale } from "../i18n/config";
+import { isLocale, type Locale } from "../i18n/config";
 
 const TRANSFER_BY_LOCALE: Record<Locale, string> = {
   es: "/es/traslados-aeropuerto-lanzarote",
   en: "/en/lanzarote-airport-transfer",
   de: "/de/lanzarote-flughafen-transfer",
+  fr: "/fr/transfert-aeroport-lanzarote",
 };
 
 const RETIRED_SECTION_RE =
-  /^\/(?:(es|en|de)\/)?(?:excursiones(?:-cruceros)?|excursions|shore-excursions|cruise-excursions|ausfluege|ausfluge|ausflüge|kreuzfahrtausfluege|kreuzfahrtausfluge|kreuzfahrtausflüge|cruceros?|cruises?|kreuzfahrten?|cruceristas|cruise-passengers|kreuzfahrtgaeste|casas(?:-vacacionales)?|holiday-homes|vacation-homes|ferienhaeuser|ferienhauser|ferienhäuser|carrito|cart|warenkorb)(?:\/|$)/i;
+  /^\/(?:(es|en|de|fr)\/)?(?:excursiones(?:-cruceros)?|excursions|shore-excursions|cruise-excursions|ausfluege|ausfluge|ausflüge|kreuzfahrtausfluege|kreuzfahrtausfluge|kreuzfahrtausflüge|cruceros?|cruises?|kreuzfahrten?|cruceristas|cruise-passengers|kreuzfahrtgaeste|casas(?:-vacacionales)?|holiday-homes|vacation-homes|ferienhaeuser|ferienhauser|ferienhäuser|carrito|cart|warenkorb)(?:\/|$)/i;
 
 const RETIRED_ADMIN =
   /^\/admin\/(?:casas|excursiones(?:-shore)?|cruceros|companias-cruceros|grupos-cruceros|puertos-cruceros|reservas-cruceros)(?:\/|$)/i;
 
 function localeFromPath(pathname: string): Locale {
-  const match = pathname.match(/^\/(es|en|de)(?:\/|$)/i);
-  const code = match?.[1]?.toLowerCase();
-  if (code === "en" || code === "de" || code === "es") return code;
+  const match = pathname.match(/^\/(es|en|de|fr)(?:\/|$)/i);
+  const code = match?.[1]?.toLowerCase() || "";
+  if (isLocale(code)) return code;
   return "es";
 }
 

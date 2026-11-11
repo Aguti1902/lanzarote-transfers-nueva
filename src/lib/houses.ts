@@ -1,3 +1,4 @@
+import { contentLocales } from "@/i18n/config";
 import type { VacationHouse } from "@/types";
 import {
   readCmsJson,
@@ -20,7 +21,7 @@ function normalizeTranslations(
 ): VacationHouse["translations"] | undefined {
   if (!translations || typeof translations !== "object") return undefined;
   const next: NonNullable<VacationHouse["translations"]> = {};
-  for (const locale of ["en", "de"] as const) {
+  for (const locale of contentLocales) {
     const block = translations[locale];
     if (!block || typeof block !== "object") continue;
     const title = String(block.title || "").trim();

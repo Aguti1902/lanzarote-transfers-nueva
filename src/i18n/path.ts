@@ -1,4 +1,4 @@
-import { isLocale, type Locale } from "./config";
+import { isLocale, locales, type Locale } from "./config";
 import { remapExcursionPath } from "./tour-slugs";
 import { destinationAliasToInternal } from "@/lib/destination-copy";
 
@@ -13,30 +13,35 @@ export const ROUTE_LOCALES = [
     es: "/reserva/confirmacion",
     en: "/booking/confirmation",
     de: "/buchung/bestaetigung",
+    fr: "/reservation/confirmation",
   },
   {
     es: "/gestionar-reserva",
     en: "/manage-booking",
     de: "/buchung-verwalten",
+    fr: "/gerer-reservation",
   },
   {
     es: "/cancelar-reserva",
     en: "/cancel-booking",
     de: "/buchung-stornieren",
+    fr: "/annuler-reservation",
   },
-  { es: "/sobre-nosotros", en: "/about-us", de: "/uber-uns" },
+  { es: "/sobre-nosotros", en: "/about-us", de: "/uber-uns", fr: "/a-propos" },
   {
     es: "/traslados-aeropuerto-lanzarote",
     en: "/lanzarote-airport-transfer",
     de: "/lanzarote-flughafen-transfer",
+    fr: "/transfert-aeroport-lanzarote",
   },
-  { es: "/contacto", en: "/contact", de: "/kontakt" },
-  { es: "/factura", en: "/invoice", de: "/rechnung" },
-  { es: "/voucher", en: "/voucher", de: "/voucher" },
-  { es: "/gateway", en: "/gateway", de: "/gateway" },
-  { es: "/privacidad", en: "/privacy", de: "/datenschutz" },
-  { es: "/condiciones", en: "/terms", de: "/agb" },
-  { es: "/cookies", en: "/cookies", de: "/cookies" },
+  { es: "/contacto", en: "/contact", de: "/kontakt", fr: "/contact" },
+  { es: "/blog", en: "/blog", de: "/blog", fr: "/blog" },
+  { es: "/factura", en: "/invoice", de: "/rechnung", fr: "/facture" },
+  { es: "/voucher", en: "/voucher", de: "/voucher", fr: "/voucher" },
+  { es: "/gateway", en: "/gateway", de: "/gateway", fr: "/gateway" },
+  { es: "/privacidad", en: "/privacy", de: "/datenschutz", fr: "/confidentialite" },
+  { es: "/condiciones", en: "/terms", de: "/agb", fr: "/conditions" },
+  { es: "/cookies", en: "/cookies", de: "/cookies", fr: "/cookies" },
 ] as const;
 
 /** Alias → segmento canónico del mismo idioma (umlauts, sinónimos legacy). */
@@ -94,7 +99,7 @@ function matchRoute(
 /** Detecta en qué “idioma de slug” está escrito el path (sin locale). */
 function detectSlugLocale(pathname: string): Locale | null {
   const path = applyAlias(normalizePathname(pathname));
-  for (const locale of ["es", "en", "de"] as Locale[]) {
+  for (const locale of locales) {
     if (matchRoute(path, locale)) return locale;
   }
   return null;
@@ -110,7 +115,7 @@ export function toInternalPath(path: string): string {
   const clean = applyAlias(normalizePathname(aliased || pathname));
   if (clean === "/") return search ? `/${search}` : "/";
 
-  for (const locale of ["es", "en", "de"] as Locale[]) {
+  for (const locale of locales) {
     const matched = matchRoute(clean, locale);
     if (matched) {
       return `${matched.route.es}${matched.rest}${search}`;

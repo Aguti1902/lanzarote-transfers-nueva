@@ -1,11 +1,14 @@
 import type { Locale } from "@/i18n/config";
 import type {
+  BlogPost,
   CruiseShoreTour,
   SiteSettings,
   Tour,
   TransfersData,
   VacationHouse,
 } from "@/types";
+import { blogSlugForLocale } from "@/i18n/blog-slugs";
+import { getBlogTopicTags } from "@/lib/blog-locale";
 import {
   readCmsJson,
   readCmsJsonFresh,
@@ -373,7 +376,7 @@ export async function localizeTour(
   const fileOverlay = (await loadTranslations(locale)).tours[tour.id] as
     | Record<string, unknown>
     | undefined;
-  const embeddedRaw = tour.translations?.[locale as "en" | "de"] as
+  const embeddedRaw = tour.translations?.[locale] as
     | Record<string, unknown>
     | undefined;
   const embedded = hasTranslationContent(embeddedRaw)
@@ -423,6 +426,50 @@ export async function localizeTours(
 ): Promise<Tour[]> {
   if (locale === "es") return tours;
   return Promise.all(tours.map((tour) => localizeTour(tour, locale)));
+}
+
+export async function localizeBlogPost(
+  post: BlogPost,
+  locale: Locale
+): Promise<BlogPost> {
+  const localizedSlug = blogSlugForLocale(post, locale);
+  if (locale === "es") {
+    return localizedSlug === post.slug ? post : { ...post, slug: localizedSlug };
+  }
+
+  const embedded = post.translations?.[locale];
+  if (embedded) {
+    const localizedTags = getBlogTopicTags(embedded.tags);
+    return {
+      ...post,
+      slug: localizedSlug,
+      title: embedded.title?.trim() || post.title,
+      excerpt: embedded.excerpt?.trim() || post.excerpt,
+      content: embedded.content?.trim() || post.content,
+      author: embedded.author?.trim() || post.author,
+      imageAlt: embedded.imageAlt?.trim() || post.imageAlt,
+      tags: localizedTags.length ? localizedTags : post.tags,
+      seo: embedded.seo || post.seo,
+    };
+  }
+
+  const translations = await loadTranslations(locale);
+  const overlay = translations.blog[post.slug] as Partial<BlogPost> | undefined;
+  const next = overlay ? { ...post, ...overlay } : { ...post };
+  return { ...next, slug: localizedSlug };
+}
+
+export async function localizeBlogPosts(
+  posts: BlogPost[],
+  locale: Locale
+): Promise<BlogPost[]> {
+  if (locale === "es") {
+    return posts.map((post) => {
+      const slug = blogSlugForLocale(post, locale);
+      return slug === post.slug ? post : { ...post, slug };
+    });
+  }
+  return Promise.all(posts.map((post) => localizeBlogPost(post, locale)));
 }
 
 export async function localizeTransfers(
@@ -485,7 +532,7 @@ export async function localizeShoreTour(
     overlayMap[SHORE_TOUR_I18N_ALIASES[tour.id] || ""]) as
     | Record<string, unknown>
     | undefined;
-  const embeddedRaw = tour.translations?.[locale as "en" | "de"] as
+  const embeddedRaw = tour.translations?.[locale] as
     | Record<string, unknown>
     | undefined;
   const embedded = hasTranslationContent(embeddedRaw)
@@ -544,7 +591,7 @@ export function localizeHouse(
   locale: Locale
 ): VacationHouse {
   if (locale === "es") return house;
-  const t = house.translations?.[locale as "en" | "de"];
+  const t = house.translations?.[locale];
   if (!t) return house;
   return {
     ...house,

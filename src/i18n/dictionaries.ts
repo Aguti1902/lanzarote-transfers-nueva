@@ -1,4 +1,5 @@
 import type { Locale } from "./config";
+import { fr } from "./dictionary-fr";
 
 export type Dictionary = {
   nav: {
@@ -8,6 +9,7 @@ export type Dictionary = {
     cruises: string;
     houses: string;
     contact: string;
+    blog: string;
     cart: string;
     manageBooking: string;
   };
@@ -37,6 +39,10 @@ export type Dictionary = {
     info: string;
     phonePrefix: string;
     phoneNumber: string;
+  };
+  meta: {
+    title: string;
+    description: string;
   };
   home: {
     ctaOffers: string;
@@ -436,6 +442,21 @@ export type Dictionary = {
     label: string;
     chatIa: string;
   };
+  blog: {
+    eyebrow: string;
+    readArticle: string;
+    readMore: string;
+    related: string;
+    searchPlaceholder: string;
+    searchButton: string;
+    otherArticles: string;
+    featuredTags: string;
+    transfersTitle: string;
+    viewAllTransfers: string;
+    searchResults: string;
+    noSearchResults: string;
+    empty: string;
+  };
   tripadvisorBadge: {
     aria: string;
     reviews: string;
@@ -458,6 +479,7 @@ const es: Dictionary = {
     cruises: "Cruceros",
     houses: "Casas",
     contact: "Contacto",
+    blog: "Blog",
     cart: "Carrito",
     manageBooking: "Gestione su reserva",
   },
@@ -487,6 +509,11 @@ const es: Dictionary = {
     info: "Información",
     phonePrefix: "Prefijo",
     phoneNumber: "Número de móvil",
+  },
+  meta: {
+    title: "Lanzarote Transfers - Traslados privados aeropuerto",
+    description:
+      "Traslados privados en Lanzarote entre el aeropuerto ACE y su hotel. Chófer con cartel, vehículo climatizado y recogida a cualquier hora.",
   },
   home: {
     ctaOffers: "Reservar traslado",
@@ -1052,6 +1079,21 @@ const es: Dictionary = {
     label: "Ayuda",
     chatIa: "Chat IA",
   },
+  blog: {
+    eyebrow: "Blog",
+    readArticle: "Leer artículo",
+    readMore: "Leer más",
+    related: "También te puede interesar",
+    searchPlaceholder: "Buscar en el blog…",
+    searchButton: "Buscar",
+    otherArticles: "Otros artículos",
+    featuredTags: "Temas destacados",
+    transfersTitle: "Traslados en Lanzarote",
+    viewAllTransfers: "Ver todos los traslados",
+    searchResults: "Resultados de búsqueda",
+    noSearchResults: "Ningún artículo coincide con esa búsqueda.",
+    empty: "Todavía no hay artículos publicados.",
+  },
   tripadvisorBadge: {
     aria: "Ver reseñas en Tripadvisor",
     reviews: "reseñas",
@@ -1074,6 +1116,7 @@ const en: Dictionary = {
     cruises: "Cruises",
     houses: "Homes",
     contact: "Contact",
+    blog: "Blog",
     cart: "Cart",
     manageBooking: "Manage booking",
   },
@@ -1103,6 +1146,11 @@ const en: Dictionary = {
     info: "Information",
     phonePrefix: "Prefix",
     phoneNumber: "Mobile number",
+  },
+  meta: {
+    title: "Lanzarote Transfers - Private airport transfers",
+    description:
+      "Private transfers in Lanzarote between ACE airport and your hotel. Driver with a name sign, air-conditioned vehicle and pickup at any time.",
   },
   home: {
     ctaOffers: "Book a transfer",
@@ -1620,6 +1668,21 @@ const en: Dictionary = {
     label: "Help",
     chatIa: "AI Chat",
   },
+  blog: {
+    eyebrow: "Blog",
+    readArticle: "Read article",
+    readMore: "Read more",
+    related: "You may also like",
+    searchPlaceholder: "Search the blog…",
+    searchButton: "Search",
+    otherArticles: "Other articles",
+    featuredTags: "Featured topics",
+    transfersTitle: "Transfers in Lanzarote",
+    viewAllTransfers: "View all transfers",
+    searchResults: "Search results",
+    noSearchResults: "No articles match that search.",
+    empty: "No articles published yet.",
+  },
   tripadvisorBadge: {
     aria: "See Tripadvisor reviews",
     reviews: "reviews",
@@ -1642,6 +1705,7 @@ const de: Dictionary = {
     cruises: "Kreuzfahrten",
     houses: "Häuser",
     contact: "Kontakt",
+    blog: "Blog",
     cart: "Warenkorb",
     manageBooking: "Buchung verwalten",
   },
@@ -1671,6 +1735,11 @@ const de: Dictionary = {
     info: "Information",
     phonePrefix: "Vorwahl",
     phoneNumber: "Handynummer",
+  },
+  meta: {
+    title: "Lanzarote Transfers - Private Flughafentransfers",
+    description:
+      "Private Transfers auf Lanzarote zwischen dem Flughafen ACE und Ihrem Hotel. Fahrer mit Namensschild, klimatisiertes Fahrzeug und Abholung zu jeder Uhrzeit.",
   },
   home: {
     ctaOffers: "Transfer buchen",
@@ -2196,6 +2265,21 @@ const de: Dictionary = {
     label: "Hilfe",
     chatIa: "KI-Chat",
   },
+  blog: {
+    eyebrow: "Blog",
+    readArticle: "Artikel lesen",
+    readMore: "Weiterlesen",
+    related: "Das könnte Sie auch interessieren",
+    searchPlaceholder: "Im Blog suchen…",
+    searchButton: "Suchen",
+    otherArticles: "Weitere Artikel",
+    featuredTags: "Themen",
+    transfersTitle: "Transfers auf Lanzarote",
+    viewAllTransfers: "Alle Transfers ansehen",
+    searchResults: "Suchergebnisse",
+    noSearchResults: "Kein Artikel entspricht dieser Suche.",
+    empty: "Es sind noch keine Artikel veröffentlicht.",
+  },
   tripadvisorBadge: {
     aria: "Tripadvisor-Bewertungen ansehen",
     reviews: "Bewertungen",
@@ -2210,7 +2294,7 @@ const de: Dictionary = {
   },
 };
 
-const dictionaries: Record<Locale, Dictionary> = { es, en, de };
+const dictionaries: Record<Locale, Dictionary> = { es, en, de, fr };
 
 const OZONE_ADVANTAGE_RE = /ozono|ozone|ozon\b/i;
 
